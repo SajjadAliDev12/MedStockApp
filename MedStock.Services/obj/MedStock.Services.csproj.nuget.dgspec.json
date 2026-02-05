@@ -144,6 +144,14 @@
               "target": "Package",
               "version": "[8.0.23, )"
             },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.4, )"
+            },
+            "SendGrid": {
+              "target": "Package",
+              "version": "[9.29.3, )"
+            },
             "SendGrid.Extensions.DependencyInjection": {
               "target": "Package",
               "version": "[1.0.1, )"

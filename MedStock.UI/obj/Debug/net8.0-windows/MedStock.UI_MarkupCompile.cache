@@ -12,8 +12,8 @@ TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\App.xaml
 22512061567
 
-75142383631
-254628010656
+561047997131
+254944342240
 MainWindow.xaml;Resources\Styles\Colors.xaml;Views\AuditLogsView.xaml;Views\CategoriesView.xaml;Views\ConsumptionReportView.xaml;Views\DashboardView.xaml;Views\DatabaseSetupView.xaml;Views\DepartmentsView.xaml;Views\ExpiryReportView.xaml;Views\ItemCategoriesView.xaml;Views\ItemsView.xaml;Views\LoginView.xaml;Views\MinStockAlertsView.xaml;Views\RequisitionDetailsView.xaml;Views\RequisitionsView.xaml;Views\StockCardView.xaml;Views\StockInView.xaml;Views\StockOutView.xaml;Views\StocktakeDetailsView.xaml;Views\StocktakesView.xaml;Views\SuppliersView.xaml;Views\UsersView.xaml;
 
 False

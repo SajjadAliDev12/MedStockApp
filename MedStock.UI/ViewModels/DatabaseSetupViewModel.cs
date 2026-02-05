@@ -118,14 +118,39 @@ namespace MedStock.UI.ViewModels
             {
                 var cs = BuildConnectionString();
 
-                var json = await File.ReadAllTextAsync(_configPointer.Path);
-                var root = JsonNode.Parse(json)!.AsObject();
+                JsonObject root = null;
 
+                // 1. محاولة قراءة الملف الحالي إذا وجد
+                if (File.Exists(_configPointer.Path))
+                {
+                    try
+                    {
+                        var json = await File.ReadAllTextAsync(_configPointer.Path);
+                        // التحقق مما إذا كان الملف يحتوي json صالح
+                        root = JsonNode.Parse(json)?.AsObject();
+                    }
+                    catch
+                    {
+                        // تجاهل الخطأ في حالة كان الملف تالفاً أو فارغاً
+                    }
+                }
+
+                // 2. إذا لم ينجح التحميل (غير موجود أو تالف)، ننشئ كائناً جديداً
+                if (root == null) root = new JsonObject();
+
+                // 3. ضمان وجود الأقسام (Sections) قبل الكتابة
                 if (root["ConnectionStrings"] == null) root["ConnectionStrings"] = new JsonObject();
-                root["ConnectionStrings"]!["HospitalDb"] = cs;
+                root["ConnectionStrings"]["HospitalDb"] = cs;
 
                 if (root["AppSettings"] == null) root["AppSettings"] = new JsonObject();
-                root["AppSettings"]!["ActivityType"] = ActivityType;
+                root["AppSettings"]["ActivityType"] = ActivityType;
+
+                // 4. التأكد من وجود المجلد قبل الكتابة (لتجنب DirectoryNotFoundException)
+                var directory = Path.GetDirectoryName(_configPointer.Path);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
 
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 await File.WriteAllTextAsync(_configPointer.Path, root.ToJsonString(options));
@@ -138,7 +163,6 @@ namespace MedStock.UI.ViewModels
             }
             finally { IsBusy = false; }
         }
-
         private string BuildConnectionString()
         {
             var builder = new SqlConnectionStringBuilder

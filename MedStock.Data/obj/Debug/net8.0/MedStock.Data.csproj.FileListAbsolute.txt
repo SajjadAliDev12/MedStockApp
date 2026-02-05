@@ -7,6 +7,7 @@ C:\Users\scorp\source\repos\MedStock\MedStock.Data\obj\Debug\net8.0\MedStock.Dat
 C:\Users\scorp\source\repos\MedStock\MedStock.Data\obj\Debug\net8.0\MedStock.Data.AssemblyInfoInputs.cache
 C:\Users\scorp\source\repos\MedStock\MedStock.Data\obj\Debug\net8.0\MedStock.Data.AssemblyInfo.cs
 C:\Users\scorp\source\repos\MedStock\MedStock.Data\obj\Debug\net8.0\MedStock.Data.csproj.CoreCompileInputs.cache
+C:\Users\scorp\source\repos\MedStock\MedStock.Data\obj\Debug\net8.0\MedStock.Data.sourcelink.json
 C:\Users\scorp\source\repos\MedStock\MedStock.Data\obj\Debug\net8.0\MedStock.Data.dll
 C:\Users\scorp\source\repos\MedStock\MedStock.Data\obj\Debug\net8.0\refint\MedStock.Data.dll
 C:\Users\scorp\source\repos\MedStock\MedStock.Data\obj\Debug\net8.0\MedStock.Data.pdb

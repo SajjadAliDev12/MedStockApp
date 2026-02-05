@@ -195,6 +195,7 @@ C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedSto
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedStock.UI.AssemblyInfoInputs.cache
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedStock.UI.AssemblyInfo.cs
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedStock.UI.csproj.CoreCompileInputs.cache
+C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedStock.UI.sourcelink.json
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\ar\MedStock.UI.resources.dll
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedStock.06EBF75E.Up2Date
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedStock.UI.dll

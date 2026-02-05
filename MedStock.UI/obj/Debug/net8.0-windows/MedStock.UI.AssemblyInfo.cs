@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MedStock.UI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc2e30bd078b73c8bb225be756a77b5a1751bed8")]
 [assembly: System.Reflection.AssemblyProductAttribute("MedStock.UI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MedStock.UI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -103,7 +103,21 @@ namespace MedStock.UI
                     services.AddSingleton<IRequisitionsService, RequisitionsService>();
                     services.AddSingleton<IDepartmentsService, DepartmentsService>();
                     services.AddSingleton<IAuditService, AuditService>();
+                    services.AddSingleton<MedStock.UI.ViewModels.ConfigFilePointer>(provider =>
+                    {
+                        // 1. تحديد مسار مجلد AppData الخاص بالمستخدم
+                        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
+                        // 2. دمج المسار مع اسم المجلد الخاص ببرنامجك واسم الملف
+                        string configPath = Path.Combine(appData, "MedStockPro", "appsettings.json");
+
+                        // 3. إنشاء نسخة من الكلاس وإسناد المسار لها
+                        // ملاحظة: افترضت هنا أن الكلاس يحتوي على خاصية Path قابلة للكتابة
+                        return new MedStock.UI.ViewModels.ConfigFilePointer
+                        {
+                            Path = configPath
+                        };
+                    });
                     // تسجيل الـ ViewModels
                     services.AddSingleton<MainWindowViewModel>();
                     services.AddSingleton<LoginViewModel>();

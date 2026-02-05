@@ -1,0 +1,153 @@
+﻿<UserControl x:Class="MedStock.UI.Views.StocktakeDetailsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:MedStock.UI.Resources"
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryDarkBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="DataGridRow">
+            <Setter Property="Padding" Value="0,2"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F5F5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20" Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0">
+            <Button DockPanel.Dock="Left" 
+                    Command="{Binding BackCommand}" 
+                    Width="110" Height="36"
+                    Content="← رجوع للقائمة" 
+                    Background="Transparent" 
+                    Foreground="{StaticResource PrimaryBrush}"
+                    BorderBrush="{StaticResource PrimaryBrush}"
+                    BorderThickness="1"
+                    FontWeight="SemiBold"
+                    Cursor="Hand"/>
+
+            <StackPanel Orientation="Horizontal" Margin="15,0,0,0" VerticalAlignment="Center">
+                <Border Width="5" Height="25" Background="{StaticResource PrimaryBrush}" CornerRadius="2" Margin="0,0,10,0"/>
+                <TextBlock Text="تسجيل العد الفعلي للجرد" 
+                           FontSize="24" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}"/>
+            </StackPanel>
+        </DockPanel>
+
+        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect Color="#DDDDDD" BlurRadius="10" Opacity="0.4"/>
+            </Border.Effect>
+
+            <DockPanel Margin="10">
+                <Border DockPanel.Dock="Top" Background="#FFF9C4" CornerRadius="5" Padding="10" Margin="0,0,0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="8" Height="8" Fill="#FBC02D" Margin="0,0,10,0"/>
+                        <TextBlock Text="يرجى إدخال الكميات المكتشفة في عمود 'العد الفعلي'. سيتم احتساب الفرق تلقائياً." 
+                                   Foreground="#574B00" FontSize="13" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+
+                <DataGrid ItemsSource="{Binding Lines}" 
+                          AutoGenerateColumns="False" 
+                          CanUserAddRows="False"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#EEEEEE"
+                          BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="المادة" Binding="{Binding ItemName}" Width="*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="الوحدة" Binding="{Binding Unit}" Width="100" IsReadOnly="True"/>
+
+                        <DataGridTextColumn Header="رصيد النظام" Binding="{Binding SystemQty ,StringFormat='{}{0:0.##}'}" Width="120" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="العد الفعلي" 
+                                            Binding="{Binding PhysicalText,StringFormat='{}{0:0.##}', UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="130" FontWeight="Bold">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Background" Value="#E3F2FD"/>
+                                    <Setter Property="Padding" Value="5"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="الفرق" Binding="{Binding Difference , StringFormat='{}{0:0.##}'}" Width="120" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{Binding DiffColor}"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Padding="12,8" Background="#E3F2FD" CornerRadius="6" BorderBrush="#BBDEFB" BorderThickness="1" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="الحالة: " FontWeight="SemiBold" Foreground="{StaticResource InfoBrush}"/>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="حفظ مؤقت (Draft)" 
+                        Command="{Binding SaveCommand}" 
+                        Width="140" Height="42" 
+                        Background="{StaticResource SecondaryBrush}"
+                        FontWeight="SemiBold"
+                        Margin="0,0,15,0"/>
+
+                <Button Content="ترحيل وتسوية (Post)" 
+                        Command="{Binding PostCommand}" 
+                        Width="200" Height="42" 
+                        Background="{StaticResource DangerBrush}" 
+                        Foreground="White" 
+                        FontSize="15"
+                        FontWeight="Bold">
+                    <Button.ToolTip>
+                        <ToolTip Content="انتباه: الترحيل سيقوم بتعديل أرصدة المخازن فعلياً ولا يمكن التراجع عنه."/>
+                    </Button.ToolTip>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,119 @@
+﻿<UserControl x:Class="MedStock.UI.Views.ItemCategoriesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:MedStock.UI.Resources" 
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <Style TargetType="ListBox">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="BorderThickness" Value="4,0,0,0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E0F2F1"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                    <Setter Property="TextBlock.FontWeight" Value="SemiBold"/>
+                    <Setter Property="TextBlock.Foreground" Value="{StaticResource PrimaryDarkBrush}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F5F5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20" Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <Border Width="5" Height="25" Background="{StaticResource PrimaryBrush}" CornerRadius="2" Margin="0,0,10,0"/>
+            <TextBlock Text="{x:Static res:Strings.ItemCategories_Title}" 
+                       FontSize="24" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}"/>
+        </StackPanel>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="1.8*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#DDDDDD" BlurRadius="10" Opacity="0.4"/>
+                </Border.Effect>
+                <DockPanel Margin="15">
+                    <TextBlock DockPanel.Dock="Top" Text="{x:Static res:Strings.Search}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,5" FontSize="12"/>
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Height="38" Text="{Binding ItemSearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                 VerticalContentAlignment="Center" Padding="10,0"/>
+                        <Button Grid.Column="1" Margin="10,0,0,0" Width="80" Height="38" Content="🔍" 
+                                Command="{Binding RefreshItemsCommand}" Background="{StaticResource SecondaryBrush}"/>
+                    </Grid>
+
+                    <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Text="{x:Static res:Strings.Select_Item}" Margin="0,0,0,10" Foreground="{StaticResource PrimaryDarkBrush}"/>
+
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="5">
+                        <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}" DisplayMemberPath="Name"/>
+                    </Border>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#DDDDDD" BlurRadius="10" Opacity="0.4"/>
+                </Border.Effect>
+                <DockPanel Margin="20">
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
+                        <TextBlock FontWeight="Bold" FontSize="18" Text="{x:Static res:Strings.Available_Categories}" Foreground="{StaticResource PrimaryBrush}"/>
+                        <TextBlock Text="قم بتحديد كافة الفئات التي تتبع لها المادة المختارة:" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                    </StackPanel>
+
+                    <Button DockPanel.Dock="Bottom" Height="45" Width="200" HorizontalAlignment="Left" Margin="0,15,0,0"
+                            Content="{x:Static res:Strings.Apply}"
+                            Command="{Binding ApplyCommand}"
+                            FontSize="16" FontWeight="Bold" Background="{StaticResource PrimaryBrush}"/>
+
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="5" Background="#FAFAFA" Padding="10">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Categories}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}" 
+                                                  IsChecked="{Binding IsChecked}" 
+                                                  Margin="0,8" 
+                                                  FontSize="14"
+                                                  VerticalContentAlignment="Center"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="3" Margin="0,15,0,0" Padding="12,8" Background="#F8F9FA" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="الحالة: " FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
+                <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextPrimaryBrush}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

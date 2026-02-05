@@ -1,0 +1,17 @@
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\bin\Debug\net8.0-windows\MedStock.Services.deps.json
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\bin\Debug\net8.0-windows\MedStock.Services.runtimeconfig.json
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\bin\Debug\net8.0-windows\MedStock.Services.dll
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\bin\Debug\net8.0-windows\MedStock.Services.pdb
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\bin\Debug\net8.0-windows\MedStock.Data.dll
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\bin\Debug\net8.0-windows\MedStock.Data.pdb
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.Services.csproj.AssemblyReference.cache
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.Services.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.Services.AssemblyInfoInputs.cache
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.Services.AssemblyInfo.cs
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.Services.csproj.CoreCompileInputs.cache
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.24EB91DF.Up2Date
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.Services.dll
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\refint\MedStock.Services.dll
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.Services.pdb
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\MedStock.Services.genruntimeconfig.cache
+C:\Users\scorp\source\repos\MedStock\MedStock.Services\obj\Debug\net8.0-windows\ref\MedStock.Services.dll

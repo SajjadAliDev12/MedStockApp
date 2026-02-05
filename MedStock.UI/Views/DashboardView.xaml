@@ -1,0 +1,82 @@
+﻿<UserControl x:Class="MedStock.UI.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <Style x:Key="StatCard" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Width" Value="260"/>
+            <Setter Property="Height" Value="140"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#E0E0E0" BlurRadius="15" ShadowDepth="2" Opacity="0.6"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="30" Background="#F9F9F9">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="{Binding WelcomeText}" FontSize="28" FontWeight="Light" Foreground="#2C3E50"/>
+            <TextBlock Text="نظرة عامة على النظام" Foreground="#7F8C8D" Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <WrapPanel Grid.Row="2" Orientation="Horizontal">
+
+            <Border Style="{StaticResource StatCard}">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="تنبيهات الحد الأدنى" Foreground="#7F8C8D" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock DockPanel.Dock="Bottom" Text="مادة وصلت للخطر" FontSize="12" Foreground="#BDC3C7"/>
+
+                    <TextBlock Text="{Binding LowStockCount}" FontSize="48" FontWeight="Bold" Foreground="#E74C3C" 
+                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+
+            <Border Style="{StaticResource StatCard}">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="طلبات تحت الإجراء" Foreground="#7F8C8D" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock DockPanel.Dock="Bottom" Text="بانتظار الموافقة" FontSize="12" Foreground="#BDC3C7"/>
+
+                    <TextBlock Text="{Binding PendingReqCount}" FontSize="48" FontWeight="Bold" Foreground="#F39C12" 
+                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+
+            <Border Style="{StaticResource StatCard}">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="صلاحية حرجة" Foreground="#7F8C8D" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock DockPanel.Dock="Bottom" Text="تنتهي خلال 90 يوم" FontSize="12" Foreground="#BDC3C7"/>
+
+                    <TextBlock Text="{Binding ExpiringSoonCount}" FontSize="48" FontWeight="Bold" Foreground="#8E44AD" 
+                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+
+            <Border Style="{StaticResource StatCard}">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="حالة النظام" Foreground="#7F8C8D" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock DockPanel.Dock="Bottom" Text="الاتصال آمن" FontSize="12" Foreground="#BDC3C7"/>
+
+                    <TextBlock Text="متصل" FontSize="36" FontWeight="Bold" Foreground="#27AE60" 
+                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+
+        </WrapPanel>
+
+    </Grid>
+</UserControl>

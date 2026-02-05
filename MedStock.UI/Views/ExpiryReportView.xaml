@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="MedStock.UI.Views.ExpiryReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FlowDirection="RightToLeft">
+
+    <Grid Margin="20" Background="#F9F9F9">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="تقرير صلاحية المواد (Expiry Dates)" FontSize="24" FontWeight="Bold" Foreground="#333"/>
+
+        <Border Grid.Row="2" Background="White" Padding="15" CornerRadius="8" BorderBrush="#DDD" BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="عرض المواد التي ستنتهي خلال (أيام):" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox Width="80" Text="{Binding DaysThreshold, UpdateSourceTrigger=PropertyChanged}" 
+                         VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="30"/>
+
+                <Button Content="تحديث القائمة" Command="{Binding RefreshCommand}" Width="120" Margin="20,0,0,0" Height="30" Background="#007ACC" Foreground="White"/>
+
+                <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="20,0,0,0" Foreground="Gray"/>
+            </StackPanel>
+        </Border>
+
+        <DataGrid Grid.Row="4" ItemsSource="{Binding Rows}" AutoGenerateColumns="False" IsReadOnly="True" 
+                  CanUserAddRows="False" GridLinesVisibility="Horizontal" Background="White">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="المادة" Binding="{Binding ItemName}" Width="*"/>
+                <DataGridTextColumn Header="رقم الوجبة (Batch)" Binding="{Binding BatchNo}" Width="150"/>
+                <DataGridTextColumn Header="تاريخ الانتهاء" Binding="{Binding ExpiryDate, StringFormat=yyyy/MM/dd}" Width="120"/>
+                <DataGridTextColumn Header="الأيام المتبقية" Binding="{Binding DaysRemaining}" Width="100"/>
+                <DataGridTextColumn Header="الكمية الحالية" Binding="{Binding Qty ,StringFormat='{}{0:0.##}'}" Width="100"/>
+                <DataGridTextColumn Header="الحالة" Binding="{Binding Status}" Width="120" FontWeight="Bold"/>
+            </DataGrid.Columns>
+
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Status}" Value="منتهية الصلاحية">
+                            <Setter Property="Background" Value="#FFCDD2"/>
+                            <Setter Property="Foreground" Value="#B71C1C"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Status}" Value="حرجة جداً">
+                            <Setter Property="Background" Value="#FFF9C4"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+        </DataGrid>
+    </Grid>
+</UserControl>

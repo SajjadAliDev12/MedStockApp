@@ -1,0 +1,175 @@
+﻿<Window x:Class="MedStock.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="clr-namespace:MedStock.UI.Resources"
+        Title="نظام إدارة المستودعات - MedStock" Height="700" Width="1100"
+        WindowStartupLocation="CenterScreen" FlowDirection="RightToLeft" WindowState="Maximized"
+        Background="{StaticResource BackgroundBrush}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="MenuBtn" TargetType="Button">
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Margin" Value="8,2,8,2"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#E5E7EB"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="10"
+                        SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border x:Name="Indicator" Grid.Column="0" Background="Transparent" CornerRadius="2"/>
+
+                                <!-- نستخدم TextBlock صريح حتى نضمن الـForeground -->
+                                <TextBlock Grid.Column="1"
+                                   Text="{TemplateBinding Content}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,10,0"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontWeight="{TemplateBinding FontWeight}"
+                                   TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#0F3D3A"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter TargetName="Indicator" Property="Background" Value="#FFB74D"/>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#0B2E2C"/>
+                                <Setter TargetName="Indicator" Property="Background" Value="#FFA000"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#6B7280"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarExpander" TargetType="Expander">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#A7F3D0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="8,10,8,0"/>
+            <Setter Property="IsExpanded" Value="False"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="{StaticResource PrimaryDarkBrush}" 
+                Visibility="{Binding IsLoggedIn, Converter={StaticResource BoolToVis}}">
+            
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="0,30,0,20">
+                    <TextBlock Text="MedStock Pro" Foreground="White" 
+                               FontSize="26" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="نظام إدارة المستودعات" Foreground="#80CBC4" 
+                               FontSize="14" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                </StackPanel>
+
+                <Button DockPanel.Dock="Bottom" Content="تسجيل الخروج" Command="{Binding LogoutCommand}" 
+                        Style="{StaticResource MenuBtn}" Background="#C62828" Margin="0,20,0,0" Height="50" Foreground="White">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" Padding="0,15">
+                                <TextBlock Text="{TemplateBinding Content}" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" BorderThickness="0" >
+                    <StackPanel Margin="0,10">
+                        <Button Content="الرئيسية (Dashboard)" Command="{Binding NavHomeCommand}" Style="{StaticResource MenuBtn}" FontWeight="Bold" Foreground="White"/>
+
+                        <Separator Background="#134E4A" Height="1" Margin="12,12"/>
+
+                        <Expander Header="العمليات المخزنية" Style="{StaticResource SidebarExpander}" IsExpanded="True">
+                            <StackPanel Margin="0,5,15,5">
+                                <Button Content="إدخال مخزني (شراء)" Command="{Binding NavStockInCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="{Binding MenuStockOut}" 
+        Command="{Binding NavStockOutCommand}" 
+        Style="{StaticResource MenuBtn}"/>
+                                <Button Content="{Binding MenuRequisitions}" 
+        Command="{Binding NavRequisitionsCommand}" 
+        Style="{StaticResource MenuBtn}"/>
+                                <Button Content="الجرد المخزني" Command="{Binding NavStocktakesCommand}" Style="{StaticResource MenuBtn}"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander Header="البيانات والتعريفات" Style="{StaticResource SidebarExpander}">
+                            <StackPanel Margin="0,5,15,5">
+                                <Button Content="دليل المواد" Command="{Binding NavItemsCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="تصنيفات المواد" Command="{Binding NavCategoriesCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="فئات المواد" Command="{Binding NavItemCategoriesCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="الموردين" Command="{Binding NavSuppliersCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="الأقسام"
+        Command="{Binding NavDepartmentsCommand}"
+        Style="{StaticResource MenuBtn}"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander Header="التقارير والتنبيهات" Style="{StaticResource SidebarExpander}">
+                            <StackPanel Margin="0,5,15,5">
+                                <Button Content="بطاقة مادة (حركة)" Command="{Binding NavReportsCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="تقرير الصلاحية" Command="{Binding NavExpiryReportCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="تنبيهات النواقص" Command="{Binding NavMinStockCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="تقارير الأستهلاك" Command="{Binding ConsumptionReport}" Style="{StaticResource MenuBtn}"/>
+                                
+                                <Button Content="سجل التدقيق" Command="{Binding GoToAuditLogsCommand}" Style="{StaticResource MenuBtn}"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander Header="إعدادات النظام" Style="{StaticResource SidebarExpander}">
+                            <StackPanel Margin="0,5,15,5">
+                                <Button Content="المستخدمين والصلاحيات" Command="{Binding NavUsersCommand}" Style="{StaticResource MenuBtn}"/>
+                            </StackPanel>
+                        </Expander>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Column="1" Background="{StaticResource BackgroundBrush}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}" Margin="0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

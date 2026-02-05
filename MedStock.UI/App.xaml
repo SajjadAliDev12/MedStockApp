@@ -1,0 +1,117 @@
+﻿<Application x:Class="MedStock.UI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MedStock.UI.ViewModels"
+             xmlns:views="clr-namespace:MedStock.UI.Views"
+             xmlns:UI="clr-namespace:MedStock.UI" xmlns:converters="clr-namespace:MedStock.UI.Converters">
+   
+    <Application.Resources>
+        
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:InvertBoolConverter x:Key="InvertBoolConverter"/>
+            <Style TargetType="{x:Type FrameworkElement}">
+                <Setter Property="FlowDirection" Value="RightToLeft"/>
+            </Style>
+
+            
+
+            <Style TargetType="{x:Type Control}">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" 
+                                    CornerRadius="4" 
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Background" Value="#BDBDBD"/>
+                                    <Setter Property="Foreground" Value="#757575"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+                <views:LoginView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+                <views:DashboardView/>
+            </DataTemplate>
+            
+            
+            <DataTemplate DataType="{x:Type vm:StockOutViewModel}">
+                <views:StockOutView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StockInViewModel}">
+                <views:StockInView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:RequisitionsViewModel}">
+                <views:RequisitionsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:RequisitionDetailsViewModel}">
+                <views:RequisitionDetailsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ItemsViewModel}">
+                <views:ItemsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:CategoriesViewModel}">
+                <views:CategoriesView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ItemCategoriesViewModel}">
+                <views:ItemCategoriesView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SuppliersViewModel}">
+                <views:SuppliersView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:MinStockAlertsViewModel}">
+                <views:MinStockAlertsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:UsersViewModel}">
+                <views:UsersView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StockCardViewModel}">
+                <views:StockCardView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StocktakesViewModel}">
+                <views:StocktakesView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StocktakeDetailsViewModel}">
+                <views:StocktakeDetailsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ExpiryReportViewModel}">
+                <views:ExpiryReportView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:DepartmentsViewModel}">
+                <views:DepartmentsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:AuditLogsViewModel}">
+                <views:AuditLogsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ConsumptionReportViewModel}">
+                <views:ConsumptionReportView/>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -154,7 +154,6 @@ namespace MedStock.Services.Implementations
                     query = query.Where(td => td.Batch.Item.ItemCategories
                         .Any(ic => ic.CategoryId == categoryId.Value));
                 }
-
                 // 4. فلترة مادة محددة
                 if (itemId.HasValue && itemId.Value > 0)
                 {
@@ -169,6 +168,10 @@ namespace MedStock.Services.Implementations
                         td.Batch.ItemId,
                         td.Batch.Item.ItemName,
                         td.Batch.Item.Sku,
+                        UnitName = td.Batch.Item.UnitOfMeasure != null
+            ? td.Batch.Item.UnitOfMeasure  // <-- غيّر UnitName حسب اسم العمود عندك
+            : ""
+
                     })
                     .Select(g => new ConsumptionSummaryRow
                     {
@@ -176,7 +179,8 @@ namespace MedStock.Services.Implementations
                         ItemName = g.Key.ItemName,
                         Sku = g.Key.Sku,
                         TotalQty = g.Sum(x => x.Quantity),
-                        TransactionCount = g.Count()
+                        TransactionCount = g.Count(),
+                        UnitName = g.Key.UnitName,
                     });
 
                 // 6. التنفيذ والترتيب (الأكثر استهلاكاً أولاً)
@@ -220,6 +224,7 @@ namespace MedStock.Services.Implementations
                         DepartmentName = td.Transaction.Department != null ? td.Transaction.Department.DepartmentName : "---",
                         Reason = td.Transaction.Reason != null ? td.Transaction.Reason.ReasonName : "",
                         Qty = td.Quantity,
+
                         Notes = td.Transaction.Notes,
                         UserName = td.Transaction.CreatedByUser != null ? td.Transaction.CreatedByUser.DisplayName : ""
                     })

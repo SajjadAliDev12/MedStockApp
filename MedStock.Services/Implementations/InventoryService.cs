@@ -182,7 +182,7 @@ namespace MedStock.Services.Implementations
                 }
 
                 if (remaining > 0m)
-                    throw new InvalidOperationException($"الرصيد غير كافٍ. الكمية المتوفرة أقل من المطلوبة بـ {remaining}.");
+                    throw new InvalidOperationException($"الرصيد غير كافٍ. الكمية المتوفرة أقل من المطلوبة بـ {(Int32)remaining}.");
 
                 var trx = new Transaction
                 {

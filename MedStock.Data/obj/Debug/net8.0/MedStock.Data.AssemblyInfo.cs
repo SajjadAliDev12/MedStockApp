@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MedStock.Data")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b403b03e9e72d9c90c983fdecd8ff3d63c23ae77")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+271c45a2b42923f332f7a507922431e360543524")]
 [assembly: System.Reflection.AssemblyProductAttribute("MedStock.Data")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MedStock.Data")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

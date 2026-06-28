@@ -206,7 +206,7 @@ namespace MedStock.UI.ViewModels
                 ReceivedDateText = NewLine.ReceivedDateText,
                 ExpiryDateText = NewLine.ExpiryDateText,
                 QtyText = qty.ToString("0.##"),
-                UnitCostText = cost.ToString("0:C0"),
+                UnitCostText = cost.ToString(),
                 LocationCode = NewLine.LocationCode.Trim(),
             });
 

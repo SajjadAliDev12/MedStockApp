@@ -119,7 +119,7 @@
 
                 <StackPanel Grid.Column="6">
                     <TextBlock Text="التكلفة" FontSize="11" FontWeight="SemiBold"/>
-                    <TextBox Height="36" Text="{Binding NewLine.UnitCostText, StringFormat='{}{0:C0}'}" VerticalContentAlignment="Center" TextAlignment="Center"/>
+                    <TextBox Height="36" Text="{Binding NewLine.UnitCostText}" VerticalContentAlignment="Center" TextAlignment="Center"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="8">
@@ -157,7 +157,7 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="تكلفة الوحدة" Binding="{Binding UnitCostText , StringFormat='{}{0:C0}'}" Width="120">
+                    <DataGridTextColumn Header="تكلفة الوحدة" Binding="{Binding UnitCostText }" Width="120">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="HorizontalAlignment" Value="Center"/>

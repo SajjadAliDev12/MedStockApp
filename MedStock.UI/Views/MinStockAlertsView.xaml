@@ -88,7 +88,7 @@
                         <DataGridTemplateColumn Header="{x:Static res:Strings.CurrentStock}" Width="130">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding CurrentStock}" 
+                                    <TextBlock Text="{Binding CurrentStock , StringFormat='{}{0:0.##}'}" 
                                                Foreground="{StaticResource DangerBrush}" 
                                                FontWeight="Bold" 
                                                HorizontalAlignment="Center" 

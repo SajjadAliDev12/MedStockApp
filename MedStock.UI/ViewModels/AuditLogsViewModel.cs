@@ -16,7 +16,7 @@ namespace MedStock.UI.ViewModels
         private string _statusMessage = "";
 
         // الفلاتر (Filters)
-        private DateTime? _dateFrom = DateTime.Today.AddDays(-7); // افتراضياً آخر أسبوع
+        private DateTime? _dateFrom = DateTime.Today.AddDays(-30); // افتراضياً آخر شهر
         private DateTime? _dateTo = DateTime.Today;
         private int? _selectedUserId;
         private string? _selectedAction;

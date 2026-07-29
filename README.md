@@ -10,7 +10,7 @@ A comprehensive Hospital Inventory Management System. Designed to streamline the
 
 | Main Dashboard | Items Management |
 | :---: | :---: |
-| ![Dashboard](<img width="1914" height="1010" alt="Screenshot 2026-02-24 211019" src="https://github.com/user-attachments/assets/04ad6486-14da-4309-b0e8-9c6f6a5c9efc" />) | ![Items](docs/images/items_placeholder.png) |
+| ![Dashboard](<img width="100%" height="100%" alt="dashboard" src="https://github.com/user-attachments/assets/04ad6486-14da-4309-b0e8-9c6f6a5c9efc" />) | ![Items](docs/images/items_placeholder.png) |
 | **Consumption Report** | **Database Setup** |
 | ![Report](docs/images/report_placeholder.png) | ![Setup](docs/images/setup_placeholder.png) |
 

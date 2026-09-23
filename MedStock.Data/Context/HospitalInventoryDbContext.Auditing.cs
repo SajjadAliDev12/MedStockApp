@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -178,7 +180,40 @@ namespace MedStock.Data.Context
 
             audit.DetailsJson = JsonSerializer.Serialize(details);
 
+            try
+            {
+                var machine = Environment.MachineName;
+                audit.MachineName = string.IsNullOrEmpty(machine)
+                    ? null
+                    : machine.Length > 80 ? machine.Substring(0, 80) : machine;
+            }
+            catch
+            {
+                audit.MachineName = null;
+            }
+
+            audit.IpAddress = GetLocalIPv4();
+
             return audit;
+        }
+
+        private static string? GetLocalIPv4()
+        {
+            try
+            {
+                var host = Dns.GetHostEntry(Dns.GetHostName());
+                foreach (var ip in host.AddressList)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip))
+                        return ip.ToString();
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

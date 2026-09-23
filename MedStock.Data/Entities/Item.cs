@@ -23,7 +23,7 @@ public partial class Item
 
     public DateTime? UpdatedAt { get; set; }
 
-    public decimal? MinStok { get; set; }
+    public decimal? MinStock { get; set; }
 
     public virtual ICollection<Batch> Batches { get; set; } = new List<Batch>();
 

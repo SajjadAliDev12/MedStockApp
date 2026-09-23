@@ -18,6 +18,7 @@ namespace MedStock.UI.Views
     /// <summary>
     /// Interaction logic for ExpiryReportView.xaml
     /// </summary>
+    // الطباعة هنا محلية على مستوى العرض (View-local): تطبع الشكل المرئي الحالي كما هو.
     public partial class ExpiryReportView : UserControl
     {
         public ExpiryReportView()
@@ -30,6 +31,13 @@ namespace MedStock.UI.Views
                    await vm.LoadDataAsync();
                 }
             };
+        }
+
+        private void Print_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new PrintDialog();
+            if (dlg.ShowDialog() == true)
+                dlg.PrintVisual(this, "تقرير صلاحية المواد");
         }
     }
 }

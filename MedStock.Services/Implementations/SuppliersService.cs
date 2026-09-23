@@ -42,6 +42,7 @@ namespace MedStock.Services.Implementations
                     Name = x.SupplierName,
                     Phone = x.Phone,
                     Email = x.Email,
+                    Address = x.Address,
                     IsActive = x.IsActive
                 })
                 .ToListAsync(ct);

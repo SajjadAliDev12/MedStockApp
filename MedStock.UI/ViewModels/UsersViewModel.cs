@@ -30,9 +30,7 @@ namespace MedStock.UI.ViewModels
         private int? _editId;
         private string _username = "";
         private string _displayName = "";
-        private string _password = ""; // Only used for New or Reset
         private bool _isActive = true;
-        private bool _isPasswordMode = false; // To show/hide password box
 
         private UserListRow? _selected;
 
@@ -46,9 +44,9 @@ namespace MedStock.UI.ViewModels
 
             RefreshCommand = new RelayCommand(async () => await RefreshAsync());
             NewCommand = new RelayCommand(StartNew);
-            SaveCommand = new RelayCommand(async () => await SaveAsync(), () => !IsBusy);
+            SaveCommand = new RelayCommand(async p => await SaveAsync(p as string), _ => !IsBusy);
             ToggleActiveCommand = new RelayCommand(async () => await ToggleActiveAsync(), () => Selected != null);
-            ResetPassCommand = new RelayCommand(async () => await ResetPassAsync(), () => Selected != null);
+            ResetPassCommand = new RelayCommand(async p => await ResetPassAsync(p as string), _ => Selected != null);
         }
 
         // Bindings
@@ -58,7 +56,6 @@ namespace MedStock.UI.ViewModels
 
         public string UsernameText { get => _username; set => SetProperty(ref _username, value); }
         public string DisplayNameText { get => _displayName; set => SetProperty(ref _displayName, value); }
-        public string PasswordText { get => _password; set => SetProperty(ref _password, value); }
         public bool IsActive { get => _isActive; set => SetProperty(ref _isActive, value); }
 
         // هل هذا مستخدم جديد؟ (لإظهار حقل الباسورد)
@@ -87,6 +84,9 @@ namespace MedStock.UI.ViewModels
 
         public async Task RefreshAsync()
         {
+            bool bootstrap = EnsureAdminOrBootstrap(out bool denied);
+            if (denied) return;
+
             IsBusy = true;
             StatusMessage = "جاري التحميل...";
             try
@@ -103,7 +103,9 @@ namespace MedStock.UI.ViewModels
                 Rows.Clear();
                 foreach (var u in list) Rows.Add(u);
 
-                StatusMessage = "";
+                StatusMessage = bootstrap
+                    ? "تحذير: المستخدم الحالي بلا أدوار (وضع التمهيد) — يُرجى إسناد دور Admin."
+                    : "";
             }
             catch (Exception ex)
             {
@@ -120,7 +122,6 @@ namespace MedStock.UI.ViewModels
             _editId = null;
             UsernameText = "";
             DisplayNameText = "";
-            PasswordText = "";
             IsActive = true;
 
             // Uncheck all roles
@@ -135,7 +136,6 @@ namespace MedStock.UI.ViewModels
             _editId = user.UserId;
             UsernameText = user.Username;
             DisplayNameText = user.DisplayName;
-            PasswordText = ""; // No password editing here directly
             IsActive = user.IsActive;
 
             // Set Roles
@@ -149,13 +149,46 @@ namespace MedStock.UI.ViewModels
             StatusMessage = "تعديل المستخدم";
         }
 
-        private async Task SaveAsync()
+        /// <summary>
+        /// Bootstrap rule: legacy users have no roles assigned. A role-less
+        /// current user gets full access (with warning); otherwise Admin role required.
+        /// Returns true when in bootstrap mode. Sets denied=true and StatusMessage when blocked.
+        /// </summary>
+        private bool EnsureAdminOrBootstrap(out bool denied)
         {
+            denied = false;
+            if (!_session.IsAuthenticated || _session.CurrentUser == null)
+            {
+                StatusMessage = "غير مصرح.";
+                denied = true;
+                return false;
+            }
+
+            var roles = _session.CurrentUser.Roles;
+            if (roles == null || roles.Count == 0)
+            {
+                StatusMessage = "تحذير: المستخدم الحالي بلا أدوار (وضع التمهيد) — يُرجى إسناد دور Admin.";
+                return true;
+            }
+
+            if (!_session.CurrentUser.IsInRole("Admin"))
+            {
+                StatusMessage = "غير مصرح: تتطلب صلاحية Admin.";
+                denied = true;
+                return false;
+            }
+
+            return false;
+        }
+
+        private async Task SaveAsync(string? passwordParam)
+        {
+            EnsureAdminOrBootstrap(out bool denied);
+            if (denied) return;
+
             IsBusy = true;
             try
             {
-                if (!_session.IsAuthenticated) throw new InvalidOperationException("غير مصرح.");
-
                 // Validate
                 var selectedRoles = AllRoles.Where(r => r.IsSelected).Select(r => r.RoleId).ToList();
                 if (!selectedRoles.Any()) throw new InvalidOperationException("يجب اختيار دور واحد على الأقل.");
@@ -165,7 +198,7 @@ namespace MedStock.UI.ViewModels
                     UserId = _editId,
                     Username = UsernameText,
                     DisplayName = DisplayNameText,
-                    Password = _editId == null ? PasswordText : null, // Send pass only for new
+                    Password = _editId == null ? passwordParam : null, // PasswordBox value passed as command parameter, never bound
                     IsActive = IsActive,
                     RoleIds = selectedRoles
                 };
@@ -186,6 +219,8 @@ namespace MedStock.UI.ViewModels
         private async Task ToggleActiveAsync()
         {
             if (Selected == null) return;
+            EnsureAdminOrBootstrap(out bool denied);
+            if (denied) return;
             try
             {
                 await _service.ToggleActiveAsync(Selected.UserId, _session.CurrentUser!.UserId);
@@ -194,10 +229,12 @@ namespace MedStock.UI.ViewModels
             catch (Exception ex) { StatusMessage = ex.Message; }
         }
 
-        private async Task ResetPassAsync()
+        private async Task ResetPassAsync(string? passwordParam)
         {
             if (Selected == null) return;
-            if (string.IsNullOrWhiteSpace(PasswordText))
+            EnsureAdminOrBootstrap(out bool denied);
+            if (denied) return;
+            if (string.IsNullOrWhiteSpace(passwordParam))
             {
                 StatusMessage = "أدخل كلمة المرور الجديدة في حقل كلمة المرور ثم اضغط الزر.";
                 return;
@@ -205,9 +242,8 @@ namespace MedStock.UI.ViewModels
 
             try
             {
-                await _service.ResetPasswordAsync(Selected.UserId, PasswordText, _session.CurrentUser!.UserId);
+                await _service.ResetPasswordAsync(Selected.UserId, passwordParam, _session.CurrentUser!.UserId);
                 StatusMessage = $"تم تغيير كلمة مرور {Selected.Username} بنجاح.";
-                PasswordText = "";
             }
             catch (Exception ex) { StatusMessage = ex.Message; }
         }

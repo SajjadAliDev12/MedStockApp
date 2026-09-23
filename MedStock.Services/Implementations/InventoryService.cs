@@ -182,7 +182,7 @@ namespace MedStock.Services.Implementations
                 }
 
                 if (remaining > 0m)
-                    throw new InvalidOperationException($"الرصيد غير كافٍ. الكمية المتوفرة أقل من المطلوبة بـ {(Int32)remaining}.");
+                    throw new InvalidOperationException($"الرصيد غير كافٍ. الكمية المتوفرة أقل من المطلوبة بـ {remaining:0.###}.");
 
                 var trx = new Transaction
                 {
@@ -221,7 +221,7 @@ namespace MedStock.Services.Implementations
                 if (request.RequisitionDetailId.HasValue)
                 {
                     var reqDetailId = request.RequisitionDetailId.Value;
-                    var now = DateTime.UtcNow;
+                    var now = DateTime.Now;
 
                     foreach (var td in createdDetails)
                     {
@@ -275,7 +275,25 @@ namespace MedStock.Services.Implementations
 
         Task<List<TransactionReasonDto>> IInventoryService.GetReasonsAsync(string scope)
         {
-            throw new NotImplementedException();
+            var normalized = string.IsNullOrWhiteSpace(scope) ? null : scope.Trim().ToUpperInvariant();
+
+            return _db.ExecuteAsync(async db =>
+            {
+                var query = db.TransactionReasons.AsNoTracking().Where(r => r.IsActive);
+
+                if (normalized == "I" || normalized == "O")
+                    query = query.Where(r => r.Scope == normalized || r.Scope == "B");
+
+                return await query
+                    .OrderBy(r => r.ReasonName)
+                    .Select(r => new TransactionReasonDto
+                    {
+                        ReasonId = r.ReasonId,
+                        ReasonName = r.ReasonName,
+                        ReasonCode = r.ReasonCode
+                    })
+                    .ToListAsync();
+            });
         }
     }
 }

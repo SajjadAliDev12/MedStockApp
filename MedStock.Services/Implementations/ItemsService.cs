@@ -56,7 +56,7 @@ namespace MedStock.Services.Implementations
                         Sku = x.Sku,
                         UnitOfMeasure = x.UnitOfMeasure,
                         ReorderLevel = x.ReorderLevel,
-                        MinStock = x.MinStok, // لاحظ الاسم في قاعدة البيانات
+                        MinStock = x.MinStock,
                         IsActive = x.IsActive,
                         // هنا يتم حساب الكمية الكلية من الدفعات
                         TotalQuantity = x.Batches.Sum(b => b.CurrentQty)
@@ -100,7 +100,7 @@ namespace MedStock.Services.Implementations
                     Sku = x.Sku,
                     UnitOfMeasure = x.UnitOfMeasure,
                     ReorderLevel = x.ReorderLevel,
-                    MinStock = x.MinStok,
+                    MinStock = x.MinStock,
                     IsActive = x.IsActive,
                     // حساب الكمية الكلية هنا أيضاً لضمان الاتساق
                     TotalQuantity = x.Batches.Sum(b => b.CurrentQty)
@@ -122,7 +122,7 @@ namespace MedStock.Services.Implementations
                     Sku = x.Sku,
                     UnitOfMeasure = x.UnitOfMeasure,
                     ReorderLevel = x.ReorderLevel,
-                    MinStock = x.MinStok,
+                    MinStock = x.MinStock,
                     Description = x.Description,
                     IsActive = x.IsActive,
                 })
@@ -185,7 +185,7 @@ namespace MedStock.Services.Implementations
                         Sku = request.Sku,
                         UnitOfMeasure = request.UnitOfMeasure,
                         ReorderLevel = request.ReorderLevel,
-                        MinStok = request.MinStock,
+                        MinStock = request.MinStock,
                         Description = request.Description,
                         IsActive = request.IsActive,
                         CreatedAt = DateTime.Now
@@ -205,7 +205,7 @@ namespace MedStock.Services.Implementations
                     entity.Sku = request.Sku;
                     entity.UnitOfMeasure = request.UnitOfMeasure;
                     entity.ReorderLevel = request.ReorderLevel;
-                    entity.MinStok = request.MinStock;
+                    entity.MinStock = request.MinStock;
                     entity.Description = request.Description;
                     entity.IsActive = request.IsActive;
                     entity.UpdatedAt = DateTime.Now;

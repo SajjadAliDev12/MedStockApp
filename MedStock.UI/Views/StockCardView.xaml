@@ -75,11 +75,21 @@
                     <DatePicker Height="38" SelectedDate="{Binding ToDate}" VerticalContentAlignment="Center"/>
                 </StackPanel>
 
-                <Button Grid.Column="6" Width="140" Height="42" VerticalAlignment="Bottom"
-                        Content="عرض التقرير"
-                        Command="{Binding GenerateCommand}"
-                        Background="{StaticResource SecondaryBrush}"
-                        FontSize="15" FontWeight="Bold"/>
+                <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <Button Width="140" Height="42"
+                            Content="عرض التقرير"
+                            Command="{Binding GenerateCommand}"
+                            Background="{StaticResource SecondaryBrush}"
+                            FontSize="15" FontWeight="Bold"/>
+                    <Button Width="120" Height="42" Margin="10,0,0,0"
+                            Content="تصدير CSV"
+                            Command="{Binding ExportCsvCommand}"
+                            FontSize="14"/>
+                    <Button Width="100" Height="42" Margin="10,0,0,0"
+                            Content="طباعة"
+                            Click="Print_Click"
+                            FontSize="14"/>
+                </StackPanel>
             </Grid>
         </Border>
 

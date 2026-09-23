@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using MedStock.Data.Context;
+﻿using MedStock.Data.Context;
 using MedStock.Data.Entities;
 using MedStock.Services.DTOs;
 using MedStock.Services.Interfaces;

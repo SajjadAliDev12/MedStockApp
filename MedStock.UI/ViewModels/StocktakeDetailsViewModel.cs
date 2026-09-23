@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using MedStock.Services.DTOs;
 using MedStock.Services.Interfaces;
 
@@ -39,7 +40,7 @@ namespace MedStock.UI.ViewModels
             }
         }
 
-        public string DiffColor => Difference < 0 ? "Crimson" : (Difference > 0 ? "Green" : "Black");
+        public Brush DiffColor => Difference < 0 ? Brushes.Crimson : (Difference > 0 ? Brushes.Green : Brushes.Black);
     }
 
     public sealed class StocktakeDetailsViewModel : ViewModelBase
@@ -61,12 +62,34 @@ namespace MedStock.UI.ViewModels
             _nav = nav;
 
             SaveCommand = new RelayCommand(async () => await SaveAsync());
-            PostCommand = new RelayCommand(async () => await PostAsync());
+            PostCommand = new RelayCommand(async () => await PostAsync(), () => CanPost && !IsBusy);
             BackCommand = new RelayCommand(() => _nav.NavigateTo<StocktakesViewModel>());
         }
 
-        public bool IsBusy { get => _isBusy; set => SetProperty(ref _isBusy, value); }
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set
+            {
+                if (SetProperty(ref _isBusy, value))
+                {
+                    PostCommand.RaiseCanExecuteChanged();
+                    SaveCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
         public string StatusMessage { get => _status; private set => SetProperty(ref _status, value); }
+
+        public bool CanPost
+        {
+            get
+            {
+                if (!_session.IsAuthenticated || _session.CurrentUser == null) return false;
+                var u = _session.CurrentUser;
+                if (u.Roles == null || u.Roles.Count == 0) return true;
+                return u.IsInRole("StoreManager", "Admin");
+            }
+        }
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand PostCommand { get; }
@@ -95,6 +118,8 @@ namespace MedStock.UI.ViewModels
                     });
                 }
                 StatusMessage = $"تم تحميل {Lines.Count} صنف للجرد.";
+                OnPropertyChanged(nameof(CanPost));
+                PostCommand.RaiseCanExecuteChanged();
             }
             catch (Exception ex) { StatusMessage = ex.Message; }
             finally { IsBusy = false; }

@@ -57,10 +57,18 @@
                              VerticalContentAlignment="Center" 
                              Padding="10,0"/>
 
-                    <Button Grid.Column="1" Margin="10,0,0,0" Width="120" Height="40"
-                            Content="{x:Static res:Strings.Search}"
-                            Command="{Binding RefreshCommand}"
-                            Background="{StaticResource SecondaryBrush}"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0">
+                        <Button Width="120" Height="40"
+                                Content="{x:Static res:Strings.Search}"
+                                Command="{Binding RefreshCommand}"
+                                Background="{StaticResource SecondaryBrush}"/>
+                        <Button Width="120" Height="40" Margin="10,0,0,0"
+                                Content="تصدير CSV"
+                                Command="{Binding ExportCsvCommand}"/>
+                        <Button Width="100" Height="40" Margin="10,0,0,0"
+                                Content="طباعة"
+                                Click="Print_Click"/>
+                    </StackPanel>
                 </Grid>
 
                 <DataGrid ItemsSource="{Binding Rows}"
@@ -101,7 +109,7 @@
             </DockPanel>
         </Border>
 
-        <Border Grid.Row="6" Margin="0,15,0,0" Padding="12,8" Background="#F8F9FA" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+        <Border Grid.Row="3" Margin="0,15,0,0" Padding="12,8" Background="#F8F9FA" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="الحالة: " FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
                 <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextPrimaryBrush}"/>

@@ -52,6 +52,7 @@ namespace MedStock.UI.ViewModels
             // تعريف الأوامر
             AddLineCommand = new RelayCommand(async () => await AddLineAsync(), () => CanEdit && !IsBusy);
             RemoveLineCommand = new RelayCommand<long>(async (id) => await RemoveLineAsync(id), _ => CanEdit && !IsBusy);
+            SaveHeaderCommand = new RelayCommand(async () => await SaveHeaderAsync(), () => CanEdit && !IsBusy);
 
             SubmitCommand = new RelayCommand(async () => await SubmitAsync(), () => CanEdit && !IsBusy);
             ApproveCommand = new RelayCommand(async () => await ApproveAsync(), () => CanApprove && !IsBusy);
@@ -74,13 +75,26 @@ namespace MedStock.UI.ViewModels
                     // تحديث حالة الأزرار عند الانشغال
                     SubmitCommand.RaiseCanExecuteChanged();
                     AddLineCommand.RaiseCanExecuteChanged();
+                    SaveHeaderCommand.RaiseCanExecuteChanged();
                 }
             }
         }
 
         public string StatusMessage { get => _statusMessage; private set => SetProperty(ref _statusMessage, value); }
 
-        public string RequisitionNo { get => _requisitionNo; set => SetProperty(ref _requisitionNo, value); }
+        public string RequisitionNo
+        {
+            get => _requisitionNo;
+            set
+            {
+                if (SetProperty(ref _requisitionNo, value))
+                    OnPropertyChanged(nameof(DetailsTitle));
+            }
+        }
+
+        public string DetailsTitle => "تفاصيل الطلب " + RequisitionNo;
+
+        public string DeptLabel => _lang.DepartmentLabel;
 
         public string Status
         {
@@ -100,6 +114,7 @@ namespace MedStock.UI.ViewModels
                     RejectCommand.RaiseCanExecuteChanged();
                     CancelCommand.RaiseCanExecuteChanged();
                     AddLineCommand.RaiseCanExecuteChanged();
+                    SaveHeaderCommand.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -133,20 +148,31 @@ namespace MedStock.UI.ViewModels
         // التعديل مسموح فقط إذا كانت مسودة
         public bool CanEdit => string.Equals(Status, "Draft", StringComparison.OrdinalIgnoreCase);
 
-        // الاعتماد مسموح إذا تم الإرسال
-        public bool CanApprove => string.Equals(Status, "Submitted", StringComparison.OrdinalIgnoreCase);
+        private bool HasRoleOrBootstrap(params string[] roles)
+        {
+            var u = _session.CurrentUser;
+            if (u == null) return false;
+            if (u.Roles == null || u.Roles.Count == 0) return true;
+            return u.IsInRole(roles);
+        }
+
+        // الاعتماد مسموح إذا تم الإرسال + دور مخول
+        public bool CanApprove => string.Equals(Status, "Submitted", StringComparison.OrdinalIgnoreCase)
+            && HasRoleOrBootstrap("StoreManager", "Admin");
 
         // الإلغاء مسموح للمسودة والمرسل
         public bool CanCancel => CanEdit || CanApprove;
 
-        // الصرف مسموح للمعتمد أو المصروف جزئياً
-        public bool CanFulfill => string.Equals(Status, "Approved", StringComparison.OrdinalIgnoreCase)
-                               || string.Equals(Status, "PartiallyFulfilled", StringComparison.OrdinalIgnoreCase);
+        // الصرف مسموح للمعتمد أو المصروف جزئياً + دور مخول
+        public bool CanFulfill => (string.Equals(Status, "Approved", StringComparison.OrdinalIgnoreCase)
+                               || string.Equals(Status, "PartiallyFulfilled", StringComparison.OrdinalIgnoreCase))
+                                && HasRoleOrBootstrap("Storekeeper", "StoreManager", "Admin");
 
 
         // --- Commands ---
         public RelayCommand AddLineCommand { get; }
         public RelayCommand<long> RemoveLineCommand { get; }
+        public RelayCommand SaveHeaderCommand { get; }
         public RelayCommand SubmitCommand { get; }
         public RelayCommand ApproveCommand { get; }
         public RelayCommand RejectCommand { get; }
@@ -271,6 +297,25 @@ namespace MedStock.UI.ViewModels
                 await _service.RemoveLineAsync(detailId, _session.CurrentUser!.UserId);
                 await InitAsync();
                 StatusMessage = "تم الحذف.";
+            }
+            catch (Exception ex) { StatusMessage = ex.Message; }
+            finally { IsBusy = false; }
+        }
+
+        private async Task SaveHeaderAsync()
+        {
+            IsBusy = true;
+            try
+            {
+                await EnsureAuth();
+                if (SelectedDepartment == null)
+                {
+                    StatusMessage = "يرجى اختيار القسم.";
+                    return;
+                }
+                await _service.UpdateHeaderAsync(_requisitionId, SelectedDepartment.DepartmentId, Notes, _session.CurrentUser!.UserId);
+                await InitAsync();
+                StatusMessage = "تم حفظ بيانات الطلب.";
             }
             catch (Exception ex) { StatusMessage = ex.Message; }
             finally { IsBusy = false; }

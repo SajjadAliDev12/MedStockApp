@@ -1,7 +1,10 @@
 ﻿using MedStock.Services.DTOs;
 using MedStock.Services.Interfaces;
+using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MedStock.UI.ViewModels
@@ -21,6 +24,7 @@ namespace MedStock.UI.ViewModels
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
             RefreshCommand = new RelayCommand(async () => await LoadDataAsync());
+            ExportCsvCommand = new RelayCommand(async () => await ExportCsvAsync(), () => !IsBusy && Rows.Count > 0);
         }
 
         // الخصائص
@@ -37,10 +41,19 @@ namespace MedStock.UI.ViewModels
             }
         }
 
-        public bool IsBusy { get => _isBusy; private set => SetProperty(ref _isBusy, value); }
+        public bool IsBusy
+        {
+            get => _isBusy;
+            private set
+            {
+                if (SetProperty(ref _isBusy, value))
+                    ExportCsvCommand.RaiseCanExecuteChanged();
+            }
+        }
         public string StatusMessage { get => _statusMessage; private set => SetProperty(ref _statusMessage, value); }
 
         public RelayCommand RefreshCommand { get; }
+        public RelayCommand ExportCsvCommand { get; }
 
         public async Task LoadDataAsync()
         {
@@ -61,6 +74,41 @@ namespace MedStock.UI.ViewModels
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        private async Task ExportCsvAsync()
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("ItemName,BatchNo,ExpiryDate,DaysRemaining,Qty,Status");
+
+                foreach (var row in Rows)
+                {
+                    var name = (row.ItemName ?? "").Replace(",", " ");
+                    var batch = (row.BatchNo ?? "").Replace(",", " ");
+                    var status = (row.Status ?? "").Replace(",", " ");
+                    var expiry = row.ExpiryDate?.ToString("yyyy/MM/dd") ?? "";
+                    sb.AppendLine($"{name},{batch},{expiry},{row.DaysRemaining},{row.Qty},{status}");
+                }
+
+                var dlg = new SaveFileDialog
+                {
+                    FileName = $"ExpiryReport_{DateTime.Now:yyyyMMdd}",
+                    DefaultExt = ".csv",
+                    Filter = "CSV Files (*.csv)|*.csv"
+                };
+
+                if (dlg.ShowDialog() == true)
+                {
+                    await File.WriteAllTextAsync(dlg.FileName, sb.ToString(), Encoding.UTF8);
+                    StatusMessage = "تم التصدير بنجاح!";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "فشل التصدير: " + ex.Message;
             }
         }
     }

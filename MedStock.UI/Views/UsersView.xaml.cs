@@ -31,5 +31,21 @@ namespace MedStock.UI.Views
                 }
             };
         }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MedStock.UI.ViewModels.UsersViewModel vm)
+            {
+                vm.SaveCommand.Execute(PwdBox.Password);
+            }
+        }
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MedStock.UI.ViewModels.UsersViewModel vm)
+            {
+                vm.ResetPassCommand.Execute(PwdBox.Password);
+            }
+        }
     }
 }

@@ -203,3 +203,6 @@ C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\refint
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedStock.UI.pdb
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\MedStock.UI.genruntimeconfig.cache
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\ref\MedStock.UI.dll
+C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\ar\MedStock.UI.resources.cs
+C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\Views\InventoryValueView.baml
+C:\Users\scorp\source\repos\MedStock\MedStock.UI\obj\Debug\net8.0-windows\Views\InventoryValueView.g.cs

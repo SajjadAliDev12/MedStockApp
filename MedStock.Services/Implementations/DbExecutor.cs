@@ -40,6 +40,7 @@ namespace MedStock.Services.Implementations
             }
             catch (Exception ex)
             {
+                FileLogger.Error(EfErrorTranslator.ToUserMessage(ex), ex);
                 throw new InvalidOperationException(EfErrorTranslator.ToUserMessage(ex), ex);
             }
         }
@@ -69,6 +70,7 @@ namespace MedStock.Services.Implementations
             }
             catch (Exception ex)
             {
+                FileLogger.Error(EfErrorTranslator.ToUserMessage(ex), ex);
                 throw new InvalidOperationException(EfErrorTranslator.ToUserMessage(ex), ex);
             }
         }

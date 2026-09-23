@@ -145,14 +145,15 @@
                                 <Button Content="تقرير الصلاحية" Command="{Binding NavExpiryReportCommand}" Style="{StaticResource MenuBtn}"/>
                                 <Button Content="تنبيهات النواقص" Command="{Binding NavMinStockCommand}" Style="{StaticResource MenuBtn}"/>
                                 <Button Content="تقارير الأستهلاك" Command="{Binding ConsumptionReport}" Style="{StaticResource MenuBtn}"/>
-                                
+                                <Button Content="قيمة المخزون" Command="{Binding NavInventoryValueCommand}" Style="{StaticResource MenuBtn}"/>
+                                 
                                 <Button Content="سجل التدقيق" Command="{Binding GoToAuditLogsCommand}" Style="{StaticResource MenuBtn}"/>
                             </StackPanel>
                         </Expander>
 
                         <Expander Header="إعدادات النظام" Style="{StaticResource SidebarExpander}">
                             <StackPanel Margin="0,5,15,5">
-                                <Button Content="المستخدمين والصلاحيات" Command="{Binding NavUsersCommand}" Style="{StaticResource MenuBtn}"/>
+                                <Button Content="المستخدمين والصلاحيات" Command="{Binding NavUsersCommand}" Style="{StaticResource MenuBtn}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}"/>
                             </StackPanel>
                         </Expander>
 
@@ -163,12 +164,8 @@
 
         <Border Grid.Column="1" Background="{StaticResource BackgroundBrush}">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
 
-                <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}" Margin="0"/>
+                <ContentControl Content="{Binding CurrentViewModel}" Margin="0"/>
             </Grid>
         </Border>
     </Grid>

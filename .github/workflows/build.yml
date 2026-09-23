@@ -1,0 +1,23 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.x
+      - name: Restore
+        run: dotnet restore --nologo
+      - name: Build
+        run: dotnet build --no-restore --nologo
+      - name: Test
+        # Unit tests run offline; the SQL integration probe self-skips
+        # (pass-skip) when no local SQL Server is available.
+        run: dotnet test --no-build --nologo

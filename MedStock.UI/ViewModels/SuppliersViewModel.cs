@@ -79,9 +79,7 @@ namespace MedStock.UI.ViewModels
                         NameText = _selected.Name;
                         PhoneText = _selected.Phone ?? "";
                         EmailText = _selected.Email ?? "";
-                        // ملاحظة: العنوان غير موجود في الـ ListRow لتخفيف الحمل، يمكن جلبه إذا أردت أو الاكتفاء بالتعديل بدونه
-                        // للتبسيط هنا سنفترض أن المستخدم سيدخل العنوان إذا أراد تعديله أو نتركه فارغاً
-                        AddressText = "";
+                        AddressText = _selected.Address ?? "";
                         IsActive = _selected.IsActive;
                         StatusMessage = "تم اختيار المورد للتعديل.";
                     }

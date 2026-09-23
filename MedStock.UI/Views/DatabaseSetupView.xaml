@@ -49,6 +49,13 @@
                     <ComboBoxItem Content="مستشفى (Hospital)" Tag="Hospital" IsSelected="True"/>
                     <ComboBoxItem Content="مذخر أدوية / جملة (Wholesale)" Tag="Wholesale"/>
                 </ComboBox>
+
+                <TextBlock Text="بريد المشرف (Admin Email):" FontWeight="SemiBold" Margin="0,10,0,0"/>
+                <TextBox Text="{Binding AdminEmail}" Height="35" Margin="0,5,0,5" Padding="5" VerticalContentAlignment="Center"/>
+                <Button Content="إرسال بريد تجريبي" Command="{Binding TestEmailCommand}" Height="35" Background="#E0E0E0" BorderThickness="0" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding TestResult}" Foreground="#2E7D32" TextWrapping="Wrap" FontSize="12" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+
+                <Button Content="نسخ احتياطي لقاعدة البيانات" Command="{Binding BackupCommand}" Height="40" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,5,0,0"/>
             </StackPanel>
         </ScrollViewer>
 

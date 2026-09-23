@@ -1,0 +1,112 @@
+<UserControl x:Class="MedStock.UI.Views.InventoryValueView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryDarkBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="DataGridRow">
+            <Setter Property="Padding" Value="0,2"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F5F5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20" Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <Border Width="5" Height="25" Background="{StaticResource PrimaryBrush}" CornerRadius="2" Margin="0,0,10,0"/>
+            <TextBlock Text="تقرير قيمة المخزون"
+                       FontSize="24" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}"/>
+        </StackPanel>
+
+        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect Color="#DDDDDD" BlurRadius="10" Opacity="0.4"/>
+            </Border.Effect>
+            <Grid Margin="15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" Height="40"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Tag="بحث عن مادة..."
+                         VerticalContentAlignment="Center"
+                         Padding="10,0"/>
+
+                <Button Grid.Column="2" Width="120" Height="40"
+                        Content="بحث"
+                        Command="{Binding RefreshCommand}"
+                        Background="{StaticResource SecondaryBrush}"/>
+
+                <Button Grid.Column="4" Width="120" Height="40"
+                        Content="تصدير CSV"
+                        Command="{Binding ExportCsvCommand}"/>
+
+                <Button Grid.Column="6" Width="120" Height="40"
+                        Content="طباعة"
+                        Click="Print_Click"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect Color="#DDDDDD" BlurRadius="10" Opacity="0.4"/>
+            </Border.Effect>
+            <DataGrid Margin="10"
+                      ItemsSource="{Binding Rows}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="#EEEEEE">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="المادة" Binding="{Binding ItemName}" Width="*"/>
+                    <DataGridTextColumn Header="الرمز (Sku)" Binding="{Binding Sku}" Width="140"/>
+                    <DataGridTextColumn Header="الوحدة" Binding="{Binding Unit}" Width="100"/>
+                    <DataGridTextColumn Header="الكمية" Binding="{Binding Qty, StringFormat='{}{0:0.##}'}" Width="110"/>
+                    <DataGridTextColumn Header="متوسط التكلفة" Binding="{Binding AvgCost, StringFormat='{}{0:0.####}'}" Width="130"/>
+                    <DataGridTextColumn Header="القيمة الإجمالية" Binding="{Binding TotalValue, StringFormat='{}{0:0.##}'}" Width="140"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <Border Grid.Row="6" Margin="0,15,0,0" Padding="12,8" Background="#F8F9FA" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="إجمالي القيمة: " FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}"/>
+                <TextBlock Text="{Binding GrandTotal, StringFormat='{}{0:0.##}'}" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}" Margin="0,0,20,0"/>
+                <TextBlock Text="الحالة: " FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
+                <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextPrimaryBrush}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

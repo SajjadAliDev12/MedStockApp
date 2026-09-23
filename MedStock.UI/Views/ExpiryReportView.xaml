@@ -22,6 +22,10 @@
 
                 <Button Content="تحديث القائمة" Command="{Binding RefreshCommand}" Width="120" Margin="20,0,0,0" Height="30" Background="#007ACC" Foreground="White"/>
 
+                <Button Content="تصدير CSV" Command="{Binding ExportCsvCommand}" Width="120" Margin="10,0,0,0" Height="30"/>
+
+                <Button Content="طباعة" Width="100" Margin="10,0,0,0" Height="30" Click="Print_Click"/>
+
                 <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="20,0,0,0" Foreground="Gray"/>
             </StackPanel>
         </Border>

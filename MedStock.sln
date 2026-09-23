@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedStock.Services", "MedSto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedStock.UI", "MedStock.UI\MedStock.UI.csproj", "{4A4F42DD-84E1-490B-9085-8579D62792D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedStock.Tests", "MedStock.Tests\MedStock.Tests.csproj", "{65987E81-EF23-4EDF-9A08-97C4A019264A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{4A4F42DD-84E1-490B-9085-8579D62792D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A4F42DD-84E1-490B-9085-8579D62792D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A4F42DD-84E1-490B-9085-8579D62792D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65987E81-EF23-4EDF-9A08-97C4A019264A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65987E81-EF23-4EDF-9A08-97C4A019264A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65987E81-EF23-4EDF-9A08-97C4A019264A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65987E81-EF23-4EDF-9A08-97C4A019264A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,5 +17,8 @@ namespace MedStock.Services.Interfaces
         Task<IReadOnlyList<ConsumptionSummaryRow>> GetConsumptionSummaryAsync(DateTime? from, DateTime? to, int? categoryId, int? itemId, CancellationToken ct = default);
 
         Task<IReadOnlyList<ConsumptionDetailRow>> GetConsumptionDetailsAsync(int itemId, DateTime? from, DateTime? to, CancellationToken ct = default);
+
+        // 3. تقرير قيمة المخزون (Inventory Value)
+        Task<IReadOnlyList<InventoryValueRow>> GetInventoryValueAsync(string? search, CancellationToken ct = default);
     }
 }

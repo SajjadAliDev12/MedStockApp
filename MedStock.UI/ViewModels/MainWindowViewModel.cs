@@ -10,6 +10,7 @@ namespace MedStock.UI.ViewModels
         private readonly ISessionContext _session;
         private ViewModelBase _current;
         private bool _isLoggedIn;
+        private bool _isAdmin;
         private readonly ILanguageService _lang;
         public MainWindowViewModel(INavigationService nav, ISessionContext session,ILanguageService lang)
         {
@@ -27,6 +28,7 @@ namespace MedStock.UI.ViewModels
                 sc.SessionChanged += () =>
                 {
                     IsLoggedIn = _session.IsAuthenticated;
+                    UpdateIsAdmin();
                     if (IsLoggedIn) _nav.NavigateTo<DashboardViewModel>();
                     else _nav.NavigateTo<LoginViewModel>();
                 };
@@ -49,9 +51,11 @@ namespace MedStock.UI.ViewModels
             NavDepartmentsCommand = new RelayCommand(() => _nav.NavigateTo<DepartmentsViewModel>());
             GoToAuditLogsCommand = new RelayCommand(() => nav.NavigateTo<AuditLogsViewModel>());
             ConsumptionReport = new RelayCommand(() => nav.NavigateTo<ConsumptionReportViewModel>());
+            NavInventoryValueCommand = new RelayCommand(() => _nav.NavigateTo<InventoryValueViewModel>());
             LogoutCommand = new RelayCommand(() => _session.Clear());
 
             // البداية
+            UpdateIsAdmin();
             _nav.NavigateTo<LoginViewModel>();
         }
 
@@ -65,6 +69,18 @@ namespace MedStock.UI.ViewModels
         {
             get => _isLoggedIn;
             private set => SetProperty(ref _isLoggedIn, value);
+        }
+
+        public bool IsAdmin
+        {
+            get => _isAdmin;
+            private set => SetProperty(ref _isAdmin, value);
+        }
+
+        private void UpdateIsAdmin()
+        {
+            var u = _session.CurrentUser;
+            IsAdmin = u != null && (u.Roles == null || u.Roles.Count == 0 || u.IsInRole("Admin"));
         }
         public string MenuRequisitions => _lang.RequisitionLabel;
 
@@ -94,6 +110,7 @@ namespace MedStock.UI.ViewModels
         public RelayCommand LogoutCommand { get; }
         public RelayCommand NavCategoriesCommand { get; }
         public RelayCommand NavItemCategoriesCommand { get; }
+        public RelayCommand NavInventoryValueCommand { get; }
         private sealed class PlaceholderViewModel : ViewModelBase { }
     }
 }

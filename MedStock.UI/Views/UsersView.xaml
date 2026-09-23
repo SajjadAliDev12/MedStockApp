@@ -111,11 +111,11 @@
                         </Border>
 
                         <TextBlock Text="كلمة المرور" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,15,0,5"/>
-                        <TextBox Height="38" Text="{Binding PasswordText, UpdateSourceTrigger=PropertyChanged}" 
+                        <PasswordBox x:Name="PwdBox" Height="38" 
                                  ToolTip="أدخل كلمة مرور جديدة للتعيين أو التغيير"/>
 
                         <Button Margin="0,8,0,0" HorizontalAlignment="Left" Content="إعادة تعيين كلمة المرور" Width="160" Height="30"
-                                Command="{Binding ResetPassCommand}" Background="{StaticResource InfoBrush}">
+                                Click="Reset_Click" Background="{StaticResource InfoBrush}">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                     <Setter Property="Visibility" Value="Visible"/>
@@ -131,7 +131,7 @@
                         <CheckBox Margin="0,20,0,0" IsChecked="{Binding IsActive}" Content="الحساب فعال وقابل للدخول" VerticalContentAlignment="Center"/>
 
                         <Button Margin="0,30,0,0" Height="45" Content="حفظ بيانات المستخدم" 
-                                Command="{Binding SaveCommand}" FontSize="16" FontWeight="Bold"/>
+                                Click="Save_Click" FontSize="16" FontWeight="Bold"/>
 
                         <TextBlock Margin="0,15,0,0" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap" 
                                    Text="{Binding StatusMessage}" TextAlignment="Center" FontWeight="SemiBold"/>

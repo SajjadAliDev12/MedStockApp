@@ -30,15 +30,15 @@ namespace MedStock.Services.Implementations
                 from i in db.Items.AsNoTracking()
                 join s in stock on i.ItemId equals s.ItemId into sj
                 from s in sj.DefaultIfEmpty()
-                where i.IsActive && i.MinStok != null
+                where i.IsActive && i.MinStock != null
                 let current = (decimal?)s.Qty ?? 0m
-                where current <= i.MinStok.Value
+                where current <= i.MinStock.Value
                 select new MinStockAlertRow
                 {
                     ItemId = i.ItemId,
                     Name = i.ItemName,
                     Sku = i.Sku,
-                    MinStock = i.MinStok,
+                    MinStock = i.MinStock,
                     CurrentStock = current
                 };
 

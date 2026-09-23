@@ -76,6 +76,33 @@
                 </DockPanel>
             </Border>
 
+            <Border Style="{StaticResource StatCard}" Width="380" Height="Auto" VerticalAlignment="Top">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="الأعلى استهلاكاً هذا الشهر" Foreground="#7F8C8D" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding MonthTotal}" FontSize="12" Foreground="#BDC3C7" Margin="0,2,0,0"/>
+
+                    <Button DockPanel.Dock="Bottom" Content="إرسال ملخص التنبيهات" Command="{Binding SendAlertsDigestCommand}"
+                            Height="36" Background="#007ACC" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,8,0,0"/>
+                    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusMessage}" FontSize="12" Foreground="#27AE60"
+                               TextWrapping="Wrap" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+
+                    <ItemsControl ItemsSource="{Binding TopConsumers}" Margin="0,8,0,8">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,4,0,4">
+                                    <DockPanel>
+                                        <TextBlock DockPanel.Dock="Right" Text="{Binding ItemName}" FontSize="12" Foreground="#2C3E50"/>
+                                        <TextBlock DockPanel.Dock="Left" Text="{Binding TotalQty}" FontSize="12" Foreground="#7F8C8D"/>
+                                    </DockPanel>
+                                    <Border Background="#2980B9" Height="10" CornerRadius="5"
+                                            Width="{Binding BarWidth}" HorizontalAlignment="Right" Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </DockPanel>
+            </Border>
+
         </WrapPanel>
 
     </Grid>

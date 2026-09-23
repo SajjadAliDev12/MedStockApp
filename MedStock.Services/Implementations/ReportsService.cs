@@ -232,6 +232,38 @@ namespace MedStock.Services.Implementations
 
             }, ct);
         }
+        // تقرير قيمة المخزون: لكل مادة فعالة مجموع الكميات + متوسط التكلفة المرجح
+        public Task<IReadOnlyList<InventoryValueRow>> GetInventoryValueAsync(string? search, CancellationToken ct = default)
+        {
+            return _db.ExecuteAsync<IReadOnlyList<InventoryValueRow>>(async db =>
+            {
+                var query = db.Items.AsNoTracking().Where(i => i.IsActive);
+
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    var s = search.Trim();
+                    query = query.Where(i => i.ItemName.Contains(s) || i.Sku.Contains(s));
+                }
+
+                var rows = await query
+                    .Select(i => new InventoryValueRow
+                    {
+                        ItemId = i.ItemId,
+                        ItemName = i.ItemName,
+                        Sku = i.Sku,
+                        Unit = i.UnitOfMeasure,
+                        Qty = i.Batches.Sum(b => b.CurrentQty),
+                        TotalValue = i.Batches.Sum(b => b.CurrentQty * b.UnitCost),
+                        AvgCost = i.Batches.Sum(b => b.CurrentQty) == 0
+                            ? 0
+                            : i.Batches.Sum(b => b.CurrentQty * b.UnitCost) / i.Batches.Sum(b => b.CurrentQty)
+                    })
+                    .OrderBy(r => r.ItemName)
+                    .ToListAsync(ct);
+
+                return (IReadOnlyList<InventoryValueRow>)rows;
+            }, ct);
+        }
         // ... دالة ExpiryReport تبقى كما هي ...
         public Task<IReadOnlyList<ExpiryReportRow>> GetExpiryReportAsync(int daysThreshold, CancellationToken ct = default)
         {

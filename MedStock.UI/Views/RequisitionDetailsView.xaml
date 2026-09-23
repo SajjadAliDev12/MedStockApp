@@ -145,7 +145,7 @@
                     </StackPanel>
 
                     <Button Grid.Column="6" Height="38" Content="حفظ المادة" VerticalAlignment="Bottom" Command="{Binding AddLineCommand}" Background="{StaticResource SuccessBrush}"/>
-                    <Button Grid.Column="8" Height="38" Content="حذف المادة" VerticalAlignment="Bottom" Command="{Binding RemoveLineCommand}" Background="{StaticResource DangerBrush}"/>
+                    <Button Grid.Column="8" Height="38" Content="حذف المادة" VerticalAlignment="Bottom" Command="{Binding RemoveLineCommand}" CommandParameter="{Binding SelectedLine.RequisitionDetailId}" Background="{StaticResource DangerBrush}"/>
                 </Grid>
 
                 <Separator Margin="0,15" Background="{StaticResource BorderBrush}"/>

@@ -3,13 +3,17 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using MedStock.Services.Implementations;
+using MedStock.Services.Interfaces;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace MedStock.UI.ViewModels
 {
     public sealed class DatabaseSetupViewModel : ViewModelBase
     {
         private readonly ConfigFilePointer _configPointer;
+        private readonly IEmailService _emailService;
 
         private string _server = ".";
         private string _database = "MedStockDb";
@@ -20,14 +24,22 @@ namespace MedStock.UI.ViewModels
         private string _username = "";
         private string _password = "";
 
+        // حقول البريد
+        private string _adminEmail = "";
+        private string _testResult = "";
+
         private string _statusMessage = "";
         private bool _isBusy;
 
-        public DatabaseSetupViewModel(ConfigFilePointer configPointer)
+        public DatabaseSetupViewModel(ConfigFilePointer configPointer, IConfiguration config)
         {
             _configPointer = configPointer;
+            // لا يتطلب تسجيل DI: نبني الخدمة من IConfiguration المسجل تلقائياً في الـ Host
+            _emailService = EmailService.FromConfiguration(config ?? throw new ArgumentNullException(nameof(config)));
             SaveCommand = new RelayCommand(async () => await SaveAsync(), () => !IsBusy);
             TestCommand = new RelayCommand(async () => await TestConnectionAsync(), () => !IsBusy);
+            TestEmailCommand = new RelayCommand(async () => await TestEmailAsync(), () => !IsBusy);
+            BackupCommand = new RelayCommand(async () => await BackupAsync(), () => !IsBusy);
 
             LoadCurrentConfig();
         }
@@ -54,11 +66,16 @@ namespace MedStock.UI.ViewModels
         public string Username { get => _username; set => SetProperty(ref _username, value); }
         public string Password { get => _password; set => SetProperty(ref _password, value); }
 
+        public string AdminEmail { get => _adminEmail; set => SetProperty(ref _adminEmail, value); }
+        public string TestResult { get => _testResult; private set => SetProperty(ref _testResult, value); }
+
         public string StatusMessage { get => _statusMessage; private set => SetProperty(ref _statusMessage, value); }
-        public bool IsBusy { get => _isBusy; set { if (SetProperty(ref _isBusy, value)) SaveCommand.RaiseCanExecuteChanged(); } }
+        public bool IsBusy { get => _isBusy; set { if (SetProperty(ref _isBusy, value)) { SaveCommand.RaiseCanExecuteChanged(); TestCommand.RaiseCanExecuteChanged(); TestEmailCommand.RaiseCanExecuteChanged(); BackupCommand.RaiseCanExecuteChanged(); } } }
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand TestCommand { get; }
+        public RelayCommand TestEmailCommand { get; }
+        public RelayCommand BackupCommand { get; }
 
         private void LoadCurrentConfig()
         {
@@ -89,6 +106,8 @@ namespace MedStock.UI.ViewModels
                 }
 
                 ActivityType = node?["AppSettings"]?["ActivityType"]?.ToString() ?? "Hospital";
+
+                AdminEmail = node?["Email"]?["AdminEmail"]?.ToString() ?? "";
             }
             catch { /* تجاهل */ }
         }
@@ -145,6 +164,10 @@ namespace MedStock.UI.ViewModels
                 if (root["AppSettings"] == null) root["AppSettings"] = new JsonObject();
                 root["AppSettings"]["ActivityType"] = ActivityType;
 
+                // 3b. حفظ بريد المشرف مع الحفاظ على بقية مفاتيح Email (ApiKey...)
+                if (root["Email"] == null) root["Email"] = new JsonObject();
+                root["Email"]["AdminEmail"] = AdminEmail;
+
                 // 4. التأكد من وجود المجلد قبل الكتابة (لتجنب DirectoryNotFoundException)
                 var directory = Path.GetDirectoryName(_configPointer.Path);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
@@ -163,6 +186,62 @@ namespace MedStock.UI.ViewModels
             }
             finally { IsBusy = false; }
         }
+        private async Task TestEmailAsync()
+        {
+            IsBusy = true;
+            try
+            {
+                if (!_emailService.IsConfigured)
+                {
+                    TestResult = "تم التخطي: مفتاح البريد (ApiKey) غير مُعد في الإعدادات.";
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(AdminEmail))
+                {
+                    TestResult = "أدخل بريد المشرف أولاً.";
+                    return;
+                }
+
+                TestResult = "جاري الإرسال...";
+                var ok = await _emailService.SendAsync(AdminEmail.Trim(), "بريد تجريبي — MedStock", "تم إعداد البريد بنجاح.");
+                TestResult = ok ? "تم إرسال البريد التجريبي بنجاح." : "فشل إرسال البريد التجريبي.";
+            }
+            catch (Exception ex)
+            {
+                TestResult = "خطأ: " + ex.Message;
+            }
+            finally { IsBusy = false; }
+        }
+
+        private async Task BackupAsync()
+        {
+            IsBusy = true;
+            StatusMessage = "جاري النسخ الاحتياطي...";
+            try
+            {
+                var dir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "MedStockPro", "Backups");
+                Directory.CreateDirectory(dir);
+                var file = Path.Combine(dir, $"{Database}_{DateTime.Now:yyyyMMdd_HHmmss}.bak");
+
+                // النسخ الاحتياطي يجب أن يعمل ضد master، فنبدل InitialCatalog
+                var masterBuilder = new SqlConnectionStringBuilder(BuildConnectionString()) { InitialCatalog = "master" };
+                using var conn = new SqlConnection(masterBuilder.ConnectionString);
+                await conn.OpenAsync();
+                using var cmd = new SqlCommand($"BACKUP DATABASE [{Database}] TO DISK='{file}' WITH INIT", conn) { CommandTimeout = 300 };
+                await cmd.ExecuteNonQueryAsync();
+
+                StatusMessage = "تم النسخ الاحتياطي: " + file;
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "فشل النسخ الاحتياطي: " + ex.Message;
+            }
+            finally { IsBusy = false; }
+        }
+
         private string BuildConnectionString()
         {
             var builder = new SqlConnectionStringBuilder

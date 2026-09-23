@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\Users\scorp\source\repos\MedStock\MedStock.UI\App.xaml
-22512061567
+23-8809676
 
-561047997131
-254944342240
-MainWindow.xaml;Resources\Styles\Colors.xaml;Views\AuditLogsView.xaml;Views\CategoriesView.xaml;Views\ConsumptionReportView.xaml;Views\DashboardView.xaml;Views\DatabaseSetupView.xaml;Views\DepartmentsView.xaml;Views\ExpiryReportView.xaml;Views\ItemCategoriesView.xaml;Views\ItemsView.xaml;Views\LoginView.xaml;Views\MinStockAlertsView.xaml;Views\RequisitionDetailsView.xaml;Views\RequisitionsView.xaml;Views\StockCardView.xaml;Views\StockInView.xaml;Views\StockOutView.xaml;Views\StocktakeDetailsView.xaml;Views\StocktakesView.xaml;Views\SuppliersView.xaml;Views\UsersView.xaml;
+57-1936415387
+2541592034680
+MainWindow.xaml;Resources\Styles\Colors.xaml;Views\AuditLogsView.xaml;Views\CategoriesView.xaml;Views\ConsumptionReportView.xaml;Views\DashboardView.xaml;Views\DatabaseSetupView.xaml;Views\DepartmentsView.xaml;Views\ExpiryReportView.xaml;Views\InventoryValueView.xaml;Views\ItemCategoriesView.xaml;Views\ItemsView.xaml;Views\LoginView.xaml;Views\MinStockAlertsView.xaml;Views\RequisitionDetailsView.xaml;Views\RequisitionsView.xaml;Views\StockCardView.xaml;Views\StockInView.xaml;Views\StockOutView.xaml;Views\StocktakeDetailsView.xaml;Views\StocktakesView.xaml;Views\SuppliersView.xaml;Views\UsersView.xaml;
 
 False
 

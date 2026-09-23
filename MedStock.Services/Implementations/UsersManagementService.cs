@@ -69,6 +69,8 @@ namespace MedStock.Services.Implementations
         {
             Guard.NotNullOrWhiteSpace(request.Username, "اسم المستخدم");
             Guard.NotNullOrWhiteSpace(request.DisplayName, "الاسم الظاهر");
+            if (!string.IsNullOrWhiteSpace(request.Password) && request.Password.Length < 8)
+                throw new ArgumentException("كلمة المرور يجب أن تكون 8 أحرف على الأقل.");
 
             return _db.ExecuteAsync(async db =>
             {
@@ -138,6 +140,8 @@ namespace MedStock.Services.Implementations
         public Task ResetPasswordAsync(int userId, string newPassword, int modifiedByUserId, CancellationToken ct = default)
         {
             Guard.NotNullOrWhiteSpace(newPassword, "كلمة المرور الجديدة");
+            if (newPassword.Length < 8)
+                throw new ArgumentException("كلمة المرور يجب أن تكون 8 أحرف على الأقل.");
 
             return _db.ExecuteAsync(async db =>
             {

@@ -21,6 +21,10 @@ public partial class User
 
     public DateTime? LastLoginAt { get; set; }
 
+    public int FailedAttempts { get; set; }
+
+    public DateTime? LockedUntil { get; set; }
+
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     public virtual ICollection<Requisition> RequisitionApprovedByUsers { get; set; } = new List<Requisition>();

@@ -1,0 +1,32 @@
+# .cursorrules — MedStock (machine-readable, enforced)
+
+> Generated from actual code 2026-09. WPF + EF Core 8.0.23 + net8.0-windows. No guessing.
+
+## formatting
+- csharp: 4 spaces, Allman braces, `file_scoped_namespaces` (as in `HospitalInventoryDbContext.cs:6`), `Nullable enable` + `ImplicitUsings enable`.
+- xaml: RTL by default (`FlowDirection="RightToLeft"` on every View/Window), `FontFamily=Segoe UI FontSize=14`, theme brushes from `Resources/Styles/Colors.xaml` (`PrimaryBrush #00695C`, `PrimaryDarkBrush`, `BackgroundBrush`…); DataGrid header style teal/white (copy from `ItemsView.xaml`).
+- naming: `*ViewModel : ViewModelBase`, `*View (UserControl|Window)`, `I*Service`, `*Service`, `*ListRow` (read), `*UpsertRequest` (write), `PagedResult<T>`, `IdNameRow`, entities singular (`Item`, `Batch`, `Transaction`…). Preserve DB typo `Item.MinStok` until migration — do NOT silently rename.
+- languages: UI strings Arabic literals in XAML/VMs + `Resources/Strings.resx|ar.resx` for shared keys (`{x:Static res:Strings.*}`); code comments Arabic+English mixed allowed.
+
+## di
+- All registrations `AddSingleton` in `MedStock.UI/App.xaml.cs:ConfigureServices` (services, VMs, `MainWindow`, `RequisitionContext`, `ConfigFilePointer`, `DbExecutor`, `HospitalDbContextFactory`, `AddDbContext<HospitalInventoryDbContext>` with `UseSqlServer+EnableRetryOnFailure(5)+CommandTimeout(30)+EnableDetailedErrors`).
+- New VM → `AddSingleton<NewViewModel>` + `DataTemplate DataType="{x:Type vm:NewViewModel}"` in `App.xaml` + menu `RelayCommand → NavigateTo<NewViewModel>` in `MainWindowViewModel`.
+- Never `new DbContext` in UI/Services; writes via `DbExecutor.ExecuteAsync<T>(Func<ctx,Task<T>>)`; light reads via `HospitalDbContextFactory.CreateDbContext()` + `AsNoTracking`.
+- `IServiceProvider.GetRequiredService<T>` only inside `NavigationService.NavigateTo<T>`.
+
+## errors
+- Services start with `Guard.Positive/NotNull/NotEmpty/PositiveDecimal/NotNullOrWhiteSpace`; user messages Arabic (`"اسم التصنيف مطلوب."`, `"الرصيد غير كافٍ."`…).
+- `DbExecutor` wraps all writes: `ExecutionStrategy + BeginTransaction + SaveChanges + Commit`, catch → `throw new InvalidOperationException(EfErrorTranslator.ToUserMessage(ex), ex)`.
+- VMs catch → `StatusMessage`/`ErrorMessage = ex.Message`; `IsBusy` toggle + `RaiseCanExecuteChanged`. No global `DispatcherUnhandledException` (missing — do not rely on one).
+- HTTP codes: N/A (desktop). `InvalidOperationException` = business rule; `Argument*` = programming/validation.
+
+## libraries
+- allowed: `EFCore{,.SqlServer,.Tools,.Design} 8.0.23`, `Extensions.{Hosting 8.0.1, DI 10.0.2, Configuration.Json 8.0.1}`, `System.Text.Json`, `Microsoft.Data.SqlClient` (setup test only).
+- restricted/unused (do NOT add usages without approval): `Newtonsoft.Json 13.0.4`, `SendGrid(+Extensions.DI)`, `Azure.Core` (stray using in `RequisitionsService.cs:1` — delete).
+- forbidden without explicit request: new logging/validation/mediator stacks, new DB providers, `EnsureCreated/Migrate()` (DB-first repo, no `Migrations/`).
+
+## boundaries
+- `UI -> Services -> Data -> SQL Server` only. No business logic in `Views/*.xaml.cs` (only `Loaded→VM.Init/Refresh/Load` + `Login_Click` + `TxtPassword_PasswordChanged`). No EF/SQL in VMs except `DatabaseSetupViewModel`.
+- `Batches.CurrentQty` moves ONLY via DB trigger `trg_TransactionDetails_StockLedger` — never assign manually.
+- Statuses are strings: `Requisition: Draft/Submitted/Approved/Rejected/Cancelled/Fulfilled`, `Stocktake: Draft/Posted/Cancelled`, `TransactionType: I/O`. Gate with `EnsureEditable` + `REQ_FULFILL` rule.
+- `PasswordBox.Password` passed as `CommandParameter`, never bound. `UsersView.PasswordText` TextBox is the single known exception (tracked in ERRORS).

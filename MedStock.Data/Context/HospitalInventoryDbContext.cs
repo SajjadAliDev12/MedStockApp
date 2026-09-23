@@ -133,7 +133,7 @@ public partial class HospitalInventoryDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ItemName).HasMaxLength(200);
-            entity.Property(e => e.MinStok).HasColumnType("decimal(18, 3)");
+            entity.Property(e => e.MinStock).HasColumnType("decimal(18, 3)");
             entity.Property(e => e.ReorderLevel).HasColumnType("decimal(18, 3)");
             entity.Property(e => e.Sku)
                 .HasMaxLength(50)

@@ -45,10 +45,12 @@ namespace MedStock.Services.Implementations
         {
             return _db.ExecuteAsync(async db =>
             {
-                // 1. إنشاء رأس الجرد
+                db.SetAuditUser(createdByUserId);
+
+                // 1. إنشاء رأس الجرد (رقم فريد)
                 var stocktake = new Stocktake
                 {
-                    StocktakeNo = $"STK-{DateTime.Now:yyMMdd}-{Random.Shared.Next(1000, 9999)}",
+                    StocktakeNo = await GenerateUniqueStocktakeNoAsync(db, ct),
                     StocktakeDate = DateTime.Now,
                     Status = "Draft",
                     Notes = notes,
@@ -133,76 +135,122 @@ namespace MedStock.Services.Implementations
             }, ct);
         }
 
-        public async Task PostAsync(int stocktakeId, int postedByUserId, CancellationToken ct = default)
+        public Task PostAsync(int stocktakeId, int postedByUserId, CancellationToken ct = default)
         {
-            // عملية معقدة: يجب أن تكون خارج DbExecutor العادي لأنها ستستدعي InventoryService
-            // التي بدورها تستخدم DbExecutor. لتجنب تداخل الـ Transactions، سننفذ المنطق بحذر.
-
-            // 1. قراءة البيانات وحساب الفروقات
-            await using var db = _factory.CreateDbContext();
-            var st = await db.Stocktakes
-                .Include(x => x.StocktakeDetails)
-                .FirstOrDefaultAsync(x => x.StocktakeId == stocktakeId, ct);
-
-            if (st == null || st.Status != "Draft") throw new InvalidOperationException("الجرد غير صالح للترحيل.");
-
-            // 2. معالجة الفروقات
-            foreach (var line in st.StocktakeDetails)
+            // ترحيل ذري واحد: كل التسويات + تحديث الحالة داخل نفس الـ Transaction.
+            // الرصيد يتحرك عبر Trigger على TransactionDetails — ممنوع لمس Batches.CurrentQty يدوياً.
+            return _db.ExecuteAsync(async db =>
             {
-                // إذا لم يدخل المستخدم قيمة، نعتبرها مطابقة للنظام (صفر فرق) أو يمكن اعتبارها 0 حسب السياسة
-                // هنا سنفترض: Null = لم يتم الجرد (تجاهل)
-                if (line.PhysicalQty == null) continue;
+                db.SetAuditUser(postedByUserId);
 
-                decimal diff = line.PhysicalQty.Value - line.SystemQty;
+                var st = await db.Stocktakes
+                    .Include(x => x.StocktakeDetails)
+                    .FirstOrDefaultAsync(x => x.StocktakeId == stocktakeId, ct);
 
-                if (diff == 0) continue; // متطابق
+                if (st == null || st.Status != "Draft")
+                    throw new InvalidOperationException("الجرد غير صالح للترحيل.");
 
-                if (diff > 0)
+                foreach (var line in st.StocktakeDetails)
                 {
-                    // زيادة (فائض) -> Stock In
-                    await _inventory.StockInAsync(new StockInRequest
+                    if (line.PhysicalQty == null) continue;
+
+                    decimal diff = line.PhysicalQty.Value - line.SystemQty;
+                    if (diff == 0) continue;
+
+                    if (diff > 0)
                     {
-                        CreatedByUserId = postedByUserId,
-                        ReasonCode = TransactionReasons.Purchase, // تأكد أن هذا الكود موجود في جدول TransactionReasons
-                        Notes = $"تسوية جرد {st.StocktakeNo} (زيادة)",
-                        Lines = new List<StockInLine>
+                        // فائض -> حركة إدخال تسوية
+                        var reasonId = await ResolveReasonIdAsync(db, TransactionReasons.AdjIn, ct);
+
+                        var trx = new Transaction
                         {
-                            new StockInLine
-                            {
-                                ItemId = line.ItemId,
-                                Quantity = diff,
-                                UnitCost = 0, // تكلفة صفرية للتسوية أو حسب سياسة المستشفى
-                                BatchCode = $"ADJ-{DateTime.Today:yyMMdd}", // باتش تجميعي
-                                ExpiryDate = DateOnly.FromDateTime(DateTime.Today.AddYears(1)) // افتراضي
-                            }
-                        }
-                    }, ct);
-                }
-                else
-                {
-                    // نقص (عجز) -> Stock Out (القيمة سالبة، نحولها لموجبة للصرف)
-                    await _inventory.StockOutAsync(new StockOutRequest
-                    {
-                        CreatedByUserId = postedByUserId,
-                        ReasonCode = TransactionReasons.AdjOut,
-                        Notes = $"تسوية جرد {st.StocktakeNo} (عجز)",
-                        ItemId = line.ItemId,
-                        Quantity = Math.Abs(diff)
-                    }, ct);
-                }
-            }
+                            TransactionNo = await GenerateUniqueTransactionNoAsync(db, ct),
+                            TransactionType = "I",
+                            TransactionDate = DateTime.Now,
+                            Notes = $"تسوية جرد {st.StocktakeNo} (زيادة)",
+                            CreatedByUserId = postedByUserId,
+                            ReasonId = reasonId
+                        };
+                        db.Transactions.Add(trx);
+                        await db.SaveChangesAsync(ct);
 
-            // 3. تحديث حالة الجرد
-            // نستخدم DbExecutor هنا لتحديث الحالة فقط
-            await _db.ExecuteAsync(async ctx =>
-            {
-                var s = await ctx.Stocktakes.FindAsync(new object[] { stocktakeId }, ct);
-                if (s != null)
-                {
-                    s.Status = "Posted";
-                    s.PostedAt = DateTime.Now;
-                    s.PostedByUserId = postedByUserId;
+                        var batch = new Batch
+                        {
+                            ItemId = line.ItemId,
+                            BatchCode = $"ADJ-{DateTime.Today:yyMMdd}-{line.ItemId}-{Random.Shared.Next(100, 999)}",
+                            ReceivedDate = DateOnly.FromDateTime(DateTime.Today),
+                            ExpiryDate = DateOnly.FromDateTime(DateTime.Today.AddYears(1)),
+                            InitialQty = diff,
+                            CurrentQty = 0, // يزيده Trigger عند حفظ التفصيل
+                            UnitCost = 0
+                        };
+                        db.Batches.Add(batch);
+                        await db.SaveChangesAsync(ct);
+
+                        db.TransactionDetails.Add(new TransactionDetail
+                        {
+                            TransactionId = trx.TransactionId,
+                            BatchId = batch.BatchId,
+                            Quantity = diff,
+                            UnitCost = 0
+                        });
+                    }
+                    else
+                    {
+                        // عجز -> حركة إخراج تسوية بتوزيع FEFO
+                        var shortage = Math.Abs(diff);
+                        var reasonId = await ResolveReasonIdAsync(db, TransactionReasons.AdjOut, ct);
+
+                        var batches = await db.Batches.AsNoTracking()
+                            .Where(b => b.ItemId == line.ItemId && b.CurrentQty > 0)
+                            .OrderBy(b => b.ExpiryDate == null ? 1 : 0)
+                            .ThenBy(b => b.ExpiryDate)
+                            .ThenBy(b => b.ReceivedDate)
+                            .ThenBy(b => b.BatchId)
+                            .ToListAsync(ct);
+
+                        decimal remaining = shortage;
+                        var allocations = new List<(long batchId, decimal qty, decimal unitCost)>();
+                        foreach (var batch in batches)
+                        {
+                            if (remaining <= 0m) break;
+                            var take = Math.Min(remaining, batch.CurrentQty);
+                            if (take <= 0m) continue;
+                            allocations.Add((batch.BatchId, take, batch.UnitCost));
+                            remaining -= take;
+                        }
+
+                        if (remaining > 0m)
+                            throw new InvalidOperationException($"الرصيد غير كافٍ للمادة رقم {line.ItemId}. النقص المتبقي {remaining:0.###}.");
+
+                        var trx = new Transaction
+                        {
+                            TransactionNo = await GenerateUniqueTransactionNoAsync(db, ct),
+                            TransactionType = "O",
+                            TransactionDate = DateTime.Now,
+                            Notes = $"تسوية جرد {st.StocktakeNo} (عجز)",
+                            CreatedByUserId = postedByUserId,
+                            ReasonId = reasonId
+                        };
+                        db.Transactions.Add(trx);
+                        await db.SaveChangesAsync(ct);
+
+                        foreach (var (batchId, qty, unitCost) in allocations)
+                        {
+                            db.TransactionDetails.Add(new TransactionDetail
+                            {
+                                TransactionId = trx.TransactionId,
+                                BatchId = batchId,
+                                Quantity = qty,
+                                UnitCost = unitCost
+                            });
+                        }
+                    }
                 }
+
+                st.Status = "Posted";
+                st.PostedAt = DateTime.Now;
+                st.PostedByUserId = postedByUserId;
             }, ct);
         }
 
@@ -218,6 +266,41 @@ namespace MedStock.Services.Implementations
                     st.CancelledByUserId = userId;
                 }
             }, ct);
+        }
+
+        private static async Task<int?> ResolveReasonIdAsync(HospitalInventoryDbContext db, string reasonCode, CancellationToken ct)
+        {
+            var reason = await db.TransactionReasons.AsNoTracking()
+                .Where(r => r.ReasonCode == reasonCode && r.IsActive)
+                .Select(r => new { r.ReasonId })
+                .FirstOrDefaultAsync(ct);
+
+            if (reason is null)
+                throw new InvalidOperationException($"سبب الحركة غير معرف أو غير فعال: '{reasonCode}'.");
+
+            return reason.ReasonId;
+        }
+
+        private static async Task<string> GenerateUniqueTransactionNoAsync(HospitalInventoryDbContext db, CancellationToken ct)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                var no = $"TRX-{DateTime.Now:yyyyMMdd-HHmmss}-{Random.Shared.Next(1000, 9999)}";
+                var exists = await db.Transactions.AsNoTracking().AnyAsync(t => t.TransactionNo == no, ct);
+                if (!exists) return no;
+            }
+            throw new InvalidOperationException("فشل توليد رقم فريد للحركة.");
+        }
+
+        private static async Task<string> GenerateUniqueStocktakeNoAsync(HospitalInventoryDbContext db, CancellationToken ct)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                var no = $"STK-{DateTime.Now:yyMMdd}-{Random.Shared.Next(1000, 9999)}";
+                var exists = await db.Stocktakes.AsNoTracking().AnyAsync(x => x.StocktakeNo == no, ct);
+                if (!exists) return no;
+            }
+            throw new InvalidOperationException("فشل توليد رقم فريد للجرد.");
         }
     }
 }

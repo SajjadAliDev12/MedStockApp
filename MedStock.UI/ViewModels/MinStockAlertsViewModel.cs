@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using MedStock.Services.DTOs;
 using MedStock.Services.Interfaces;
+using Microsoft.Win32;
 
 namespace MedStock.UI.ViewModels
 {
@@ -25,16 +28,21 @@ namespace MedStock.UI.ViewModels
             private set
             {
                 if (SetProperty(ref _isBusy, value))
+                {
                     RefreshCommand.RaiseCanExecuteChanged();
+                    ExportCsvCommand.RaiseCanExecuteChanged();
+                }
             }
         }
 
         public RelayCommand RefreshCommand { get; }
+        public RelayCommand ExportCsvCommand { get; }
 
         public MinStockAlertsViewModel(IAlertsService svc)
         {
             _svc = svc ?? throw new ArgumentNullException(nameof(svc));
             RefreshCommand = new RelayCommand(async () => await RefreshAsync(), () => !IsBusy);
+            ExportCsvCommand = new RelayCommand(async () => await ExportCsvAsync(), () => !IsBusy && Rows.Count > 0);
         }
 
         public async Task RefreshAsync()
@@ -56,6 +64,39 @@ namespace MedStock.UI.ViewModels
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        private async Task ExportCsvAsync()
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("ItemId,Name,Sku,MinStock,CurrentStock");
+
+                foreach (var row in Rows)
+                {
+                    var name = (row.Name ?? "").Replace(",", " ");
+                    var sku = (row.Sku ?? "").Replace(",", " ");
+                    sb.AppendLine($"{row.ItemId},{name},{sku},{row.MinStock},{row.CurrentStock}");
+                }
+
+                var dlg = new SaveFileDialog
+                {
+                    FileName = $"MinStockAlerts_{DateTime.Now:yyyyMMdd}",
+                    DefaultExt = ".csv",
+                    Filter = "CSV Files (*.csv)|*.csv"
+                };
+
+                if (dlg.ShowDialog() == true)
+                {
+                    await File.WriteAllTextAsync(dlg.FileName, sb.ToString(), Encoding.UTF8);
+                    StatusMessage = "تم التصدير بنجاح!";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "فشل التصدير: " + ex.Message;
             }
         }
     }
